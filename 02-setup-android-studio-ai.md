@@ -82,4 +82,4 @@ dev.mindfuldays.app/
 └── MainActivity.kt
 ```
 
-Com a estrutura do projeto sincronizada e compilando no **Android Studio Stable**, avançamos para o **Módulo 3: Implementação da UI em Compose e Integração com Gemini API**.
+Com a estrutura do projeto sincronizada e compilando no **Android Studio Stable**, avançamos para o **Módulo 3: Diretrizes com AGENTS.md, Implementação da UI em Compose e Integração com Gemini API**.

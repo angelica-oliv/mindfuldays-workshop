@@ -11,7 +11,7 @@ Construir do zero um aplicativo completo de mindfulness focado na exibição di�
 Neste workshop, os participantes aprenderão a:
 1. Prototipar a interface gráfica e extrair tokens de design usando o **Google Stitch**.
 2. Criar a estrutura do projeto com assistentes de IA diretamente na versão **Stable do Android Studio**.
-3. Construir interfaces declarativas modernas com **Jetpack Compose** e **Material Design 3**.
+3. Padronizar o contexto para agentes de IA com **AGENTS.md** e construir interfaces declarativas com **Jetpack Compose** e **Material Design 3**.
 4. Integrar chamadas dinâmicas de IA generativa com **Gemini**.
 5. Configurar suítes de testes e pipelines automatizados de CI/CD via **GitHub Actions**.
 
@@ -43,9 +43,9 @@ Antes de iniciar os módulos práticos, certifique-se de ter os seguintes softwa
 
 Siga os arquivos `.md` na sequência proposta para concluir o workshop:
 
-1. [**`01-design-ui-stitch-v2.md`**](./01-design-ui-stitch-v2.md) — *Passo 1: Prototipagem Visual, Sitemap e Design System no Google Stitch (Versão Enxuta)*
+1. [**`01-design-ui-stitch.md`**](./01-design-ui-stitch.md) — *Passo 1: Prototipagem Visual, Sitemap e Design System no Google Stitch (Versão Enxuta)*
 2. [**`02-setup-android-studio-ai.md`**](./02-setup-android-studio-ai.md) — *Passo 2: Configuração do Android Studio Stable e Inicialização com Create with AI*
-3. [**`03-implementacao-compose-e-logica.md`**](./03-implementacao-compose-e-logica.md) — *Passo 3: Interface em Jetpack Compose, Regras das 9 Atitudes e Gemini API*
+3. [**`03-implementacao-compose-e-logica.md`**](./03-implementacao-compose-e-logica.md) — *Passo 3: Diretrizes com AGENTS.md, Interface em Jetpack Compose, Regras das 9 Atitudes e Gemini API*
 4. [**`04-qualidade-testes-cicd.md`**](./04-qualidade-testes-cicd.md) — *Passo 4: Testes Unitários/UI, Pipeline no GitHub Actions e Boas Práticas*
 
 ---
