@@ -35,7 +35,7 @@ Antes de iniciar los módulos prácticos, asegúrate de contar con los siguiente
 
 * **Android Studio**: Versión **Estable** más reciente (ej.: Iguana, Jellyfish o superior).
 * **JDK**: Java Development Kit 17 o superior.
-* **Clave de API de Gemini**: Obtén gratuitamente una API Key en [Google AI Studio](https://aistudio.google.com/).
+* **Llave de API de Gemini**: Obtén gratuitamente una API Key en [Google AI Studio](https://aistudio.google.com/).
 * **Cuenta en Google Stitch / Figma**: Para generación e inspección de prototipos visuales.
 * **Git y Cuenta en GitHub**: Para control de versiones del código y ejecución de pipelines de CI/CD.
 
