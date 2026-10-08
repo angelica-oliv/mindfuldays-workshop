@@ -56,16 +56,15 @@ REQUIRED SCREENS & EXACT ELEMENTS:
    (DO NOT include: multiple dials, duration selector chips, interval bells, background sounds, or chime pickers).
 
 3. Screen 3 — Settings Screen:
-   - TopAppBar: Title "Configurações" with a back navigation arrow.
+   - TopAppBar: Title "Configuración" with a back navigation arrow.
    - Reminders Card (Surface):
-     * Row with text "Lembrete da Atitude Diária" and standard native Material 3 Switch (checked).
+     * Row with text "Recordatorio de Actitud Diaria" and standard native Material 3 Switch (checked).
      * Thin horizontal divider.
-     * Row with text "Lembrete para Meditar" and standard native Material 3 Switch (unchecked).
-   - Gemini API Card (Surface):
-     * Text label: "Chave de API do Gemini"
-     * Standard OutlinedTextField with placeholder "Cole sua API Key aqui..."
-     * Primary Button: "Salvar Chave"
-   (DO NOT include: time wheel dialogs, sound selectors, nested accordion cards, or multi-tab navigation).
+     * Row with text "Recordatorio para Meditar" and standard native Material 3 Switch (unchecked).
+   - About Card (Surface):
+     * Title: "Acerca de la App"
+     * Description text: "MindfulDays v1.0 • 9 Actitudes de Jon Kabat-Zinn"
+   (DO NOT include: API key input fields, time wheel dialogs, sound selectors, nested accordion cards, or multi-tab navigation — API keys belong to code/configuration, never user UI).
 ```
 
 ---

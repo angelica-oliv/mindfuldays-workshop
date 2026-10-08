@@ -193,7 +193,7 @@ class GeminiApiService(private val apiKey: String) {
 
     suspend fun generateReflection(attitudeTitle: String): String = withContext(Dispatchers.IO) {
         if (apiKey.isBlank()) {
-            return@withContext "Ingresa tu API Key de Gemini en la configuración para generar reflexiones personalizadas."
+            return@withContext "Configura tu GEMINI_API_KEY en el archivo local.properties para generar reflexiones personalizadas."
         }
 
         try {

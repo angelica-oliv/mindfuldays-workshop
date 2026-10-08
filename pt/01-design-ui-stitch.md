@@ -61,11 +61,10 @@ REQUIRED SCREENS & EXACT ELEMENTS:
      * Row with text "Lembrete da Atitude Diária" and standard native Material 3 Switch (checked).
      * Thin horizontal divider.
      * Row with text "Lembrete para Meditar" and standard native Material 3 Switch (unchecked).
-   - Gemini API Card (Surface):
-     * Text label: "Chave de API do Gemini"
-     * Standard OutlinedTextField with placeholder "Cole sua API Key aqui..."
-     * Primary Button: "Salvar Chave"
-   (DO NOT include: time wheel dialogs, sound selectors, nested accordion cards, or multi-tab navigation).
+   - About Card (Surface):
+     * Title: "Sobre o App"
+     * Description text: "MindfulDays v1.0 • 9 Atitudes de Jon Kabat-Zinn"
+   (DO NOT include: API key input fields, time wheel dialogs, sound selectors, nested accordion cards, or multi-tab navigation — API keys belong to code/configuration, never user UI).
 ```
 
 ---
