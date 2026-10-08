@@ -15,7 +15,7 @@
 ## 📱 Acerca del Proyecto / Sobre o Projeto
 
 **MindfulDays** es un proyecto práctico diseñado para enseñar desarrollo Android moderno asistido por Inteligencia Artificial:
-* **Prototipado rápido y Design System** con **Google Stitch**.
+* **Prototipado rápido y Design System** con **[Google Stitch](https://stitch.withgoogle.com/)**.
 * **Generación de arquitectura y setup** en **Android Studio (Versión Estable)** con Gemini.
 * **Contexto estructurado para agentes** con **AGENTS.md**.
 * **UI declarativa moderna** con **Jetpack Compose** y **Material Design 3**.

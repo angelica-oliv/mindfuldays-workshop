@@ -11,7 +11,7 @@
 Construir desde cero una aplicación completa de mindfulness enfocada en mostrar diariamente reflexiones basadas en las **9 Actitudes de Mindfulness de Jon Kabat-Zinn**, integrada con la **Gemini API** para la generación de consejos personalizados y equipada con un **Temporizador de Meditación** intuitivo.
 
 En este workshop, los participantes aprenderán a:
-1. Prototipar la interfaz gráfica y extraer tokens de diseño usando **Google Stitch**.
+1. Prototipar la interfaz gráfica y extraer tokens de diseño usando **[Google Stitch](https://stitch.withgoogle.com/)**.
 2. Crear la estructura del proyecto con asistentes de IA directamente en la versión **Estable de Android Studio**.
 3. Estandarizar el contexto para agentes de IA con **AGENTS.md** y construir interfaces declarativas con **Jetpack Compose** y **Material Design 3**.
 4. Integrar llamadas dinámicas de IA generativa con **Gemini**.
@@ -36,7 +36,7 @@ Antes de iniciar los módulos prácticos, asegúrate de contar con los siguiente
 * **Android Studio**: Versión **Estable** más reciente (ej.: Iguana, Jellyfish o superior).
 * **JDK**: Java Development Kit 17 o superior.
 * **Llave de API de Gemini**: Obtén gratuitamente una API Key en [Google AI Studio](https://aistudio.google.com/).
-* **Cuenta en Google Stitch / Figma**: Para generación e inspección de prototipos visuales.
+* **Cuenta en [Google Stitch](https://stitch.withgoogle.com/) / Figma**: Para generación e inspección de prototipos visuales.
 * **Git y Cuenta en GitHub**: Para control de versiones del código y ejecución de pipelines de CI/CD.
 
 ---

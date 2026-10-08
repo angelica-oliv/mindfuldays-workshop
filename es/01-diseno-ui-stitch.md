@@ -1,6 +1,6 @@
-# 🎨 Módulo 1 — Prototipado Visual y Design System en Google Stitch
+# 🎨 Módulo 1 — Prototipado Visual y Design System en [Google Stitch](https://stitch.withgoogle.com/)
 
-En este módulo, definiremos el flujo de pantallas de la app **MindfulDays** y utilizaremos **Google Stitch** para generar la interfaz visual y extraer los *design tokens* en Material Design 3.
+En este módulo, definiremos el flujo de pantallas de la app **MindfulDays** y utilizaremos **[Google Stitch](https://stitch.withgoogle.com/)** para generar la interfaz visual y extraer los *design tokens* en Material Design 3.
 
 ---
 
@@ -9,14 +9,14 @@ En este módulo, definiremos el flujo de pantallas de la app **MindfulDays** y u
 La aplicación cuenta con un flujo simple centrado en 3 pantallas:
 
 1. **Home Screen**: Muestra la fecha actual, la indicación de la actitud del día (en un ciclo de 1 a 9), tarjeta con frase reflexiva, botón de IA (*AI Sparkle*) para solicitar un consejo mediante la Gemini API y acceso directo al temporizador.
-2. **Timer Screen**: Contador regresivo circular y minimalista para meditación con controles de play, pause y reset.
+2. **Timer Screen**: Contador regresivo circular y minimalista para meditación con controles de play, pause e reset.
 3. **Settings Screen**: Opciones de recordatorios y notificaciones diarias con selector de hora.
 
 ---
 
-## 💬 1.2. Prompt de UI para Google Stitch
+## 💬 1.2. Prompt de UI para [Google Stitch](https://stitch.withgoogle.com/)
 
-Copia y pega el siguiente prompt en **Google Stitch** para generar las pantallas de la app. El contexto de las 9 actitudes y las directrices de diseño ya están incorporados directamente en el prompt:
+Copia y pega el siguiente prompt en **[Google Stitch](https://stitch.withgoogle.com/)** para generar las pantallas de la app. El contexto de las 9 actitudes y las directrices de diseño ya están incorporados directamente en el prompt:
 
 ```text
 Design a calm, minimalist mobile app interface for a Mindfulness application named "MindfulDays", based on Material Design 3 guidelines.
@@ -40,7 +40,7 @@ Screens required:
 
 ## 🎨 1.3. Extracción de Assets y Tokens
 
-Después de generar las pantallas en Stitch:
+Después de generar las pantallas en [Google Stitch](https://stitch.withgoogle.com/):
 1. Captura capturas de pantalla (screenshots) en alta resolución de las 3 pantallas generadas (usarás estas imágenes en el Módulo 2 dentro de Android Studio).
 2. Anota los tokens de colores para la configuración en **Jetpack Compose**:
    * `Primary`: `#6B8E23` (Sage Green)
@@ -50,4 +50,4 @@ Después de generar las pantallas en Stitch:
 
 ---
 
-¡Listo! Con la interfaz prototipada en Stitch y los tokens a mano, avanza al archivo **`02-setup-android-studio-ia.md`**.
+¡Listo! Con la interfaz prototipada en [Google Stitch](https://stitch.withgoogle.com/) y los tokens a mano, avanza al archivo **`02-setup-android-studio-ia.md`**.

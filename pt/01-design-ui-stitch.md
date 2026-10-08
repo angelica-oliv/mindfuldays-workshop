@@ -1,6 +1,6 @@
-# 🎨 Módulo 1 — Prototipagem Visual e Design System no Google Stitch
+# 🎨 Módulo 1 — Prototipagem Visual e Design System no [Google Stitch](https://stitch.withgoogle.com/)
 
-Neste módulo, vamos definir o fluxo de telas do app **MindfulDays** e utilizar o **Google Stitch** para gerar a interface visual e extrair os *design tokens* em Material Design 3.
+Neste módulo, vamos definir o fluxo de telas do app **MindfulDays** e utilizar o **[Google Stitch](https://stitch.withgoogle.com/)** para gerar a interface visual e extrair os *design tokens* em Material Design 3.
 
 ---
 
@@ -14,9 +14,9 @@ O aplicativo possui um fluxo simples centrado em 3 telas:
 
 ---
 
-## 💬 1.2. Prompt de UI para o Google Stitch
+## 💬 1.2. Prompt de UI para o [Google Stitch](https://stitch.withgoogle.com/)
 
-Copie e cole o prompt abaixo no **Google Stitch** para gerar as telas do app. O contexto das 9 atitudes e as diretrizes de design já estão embarcados diretamente no prompt:
+Copie e cole o prompt abaixo no **[Google Stitch](https://stitch.withgoogle.com/)** para gerar as telas do app. O contexto das 9 atitudes e as diretrizes de design já estão embarcados diretamente no prompt:
 
 ```text
 Design a calm, minimalist mobile app interface for a Mindfulness application named "MindfulDays", based on Material Design 3 guidelines.
@@ -40,7 +40,7 @@ Screens required:
 
 ## 🎨 1.3. Extração de Assets e Tokens
 
-Após gerar as telas no Stitch:
+Após gerar as telas no [Google Stitch](https://stitch.withgoogle.com/):
 1. Capture screenshots em alta resolução das 3 telas geradas (você usará essas imagens no Módulo 2 no Android Studio).
 2. Anote os tokens de cores para configuração no **Jetpack Compose**:
    * `Primary`: `#6B8E23` (Sage Green)
@@ -50,4 +50,4 @@ Após gerar as telas no Stitch:
 
 ---
 
-Pronto! Com a interface prototipada no Stitch e os tokens em mãos, avance para o **`02-setup-android-studio-ai.md`**.
+Pronto! Com a interface prototipada no [Google Stitch](https://stitch.withgoogle.com/) e os tokens em mãos, avance para o **`02-setup-android-studio-ai.md`**.
