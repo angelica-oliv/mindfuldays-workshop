@@ -14,26 +14,58 @@ La aplicación cuenta con un flujo simple centrado en 3 pantallas:
 
 ---
 
-## 💬 1.2. Prompt de UI para [Google Stitch](https://stitch.withgoogle.com/)
+## 💬 1.2. Prompt de UI Prescriptivo para [Google Stitch](https://stitch.withgoogle.com/)
 
-Copia y pega el siguiente prompt en **[Google Stitch](https://stitch.withgoogle.com/)** para generar las pantallas de la app. El contexto de las 9 actitudes y las directrices de diseño ya están incorporados directamente en el prompt:
+Para asegurar que la IA genere un diseño limpio, didáctico y 100% alineado con los componentes nativos de Android (evitando que Stitch cree fuentes personalizadas o pantallas sobrecargadas con gráficos y reproductores de audio complejos), utiliza este prompt prescriptivo:
 
 ```text
-Design a calm, minimalist mobile app interface for a Mindfulness application named "MindfulDays", based on Material Design 3 guidelines.
+Design an ultra-minimalist, clean Android mobile application interface for a tutorial app named "MindfulDays", strictly adhering to Material Design 3.
 
-Concept:
-An application that rotates daily through 9 Mindfulness Attitudes (Beginner's Mind, Non-Judging, Acceptance, Letting Go, Trust, Non-Striving, Patience, Gratitude, Generosity) based on Jon Kabat-Zinn's principles.
+IMPORTANT DESIGN SYSTEM CONSTRAINTS (STRICT):
+- Components: Use ONLY standard native Android Material 3 components (TopAppBar, ElevatedCard, Button, OutlinedButton, IconButton, Switch, OutlinedTextField, HorizontalDivider). DO NOT create custom complex components, custom pills, audio waveforms, habit streaks, or charts.
+- Typography: Use standard Android system default typography (Roboto / system sans-serif). DO NOT use custom, serif, or imported fonts (no Newsreader, no Plus Jakarta Sans).
+- Layout: Pure single-column layout with generous whitespace. Keep screens extremely simple and didactic for a live-coding workshop.
+- Color Palette:
+  * Primary: Soft sage green (#6B8E23)
+  * Secondary / Dividers: Sand / Muted beige (#E8DFD8)
+  * Background: Warm off-white (#FBF9F5)
+  * Surface / Cards: Pure white (#FFFFFF)
+  * Text / Icons: Dark forest green (#2C3E35)
 
-Color Palette:
-- Primary: Soft sage green (#6B8E23)
-- Secondary: Sand / Muted beige (#E8DFD8)
-- Background: Warm off-white (#FBF9F5)
-- Text / Content: Dark forest green (#2C3E35)
+REQUIRED SCREENS & EXACT ELEMENTS:
 
-Screens required:
-1. Home Screen: Top header with date and attitude indicator ("Attitude 3 of 9: Acceptance"). Large central card with a quote, an AI Sparkle action button for Gemini reflections, and a bottom shortcut button to the Meditation Timer.
-2. Timer Screen: Minimalist circular countdown timer (default 10:00) with clean play, pause, and reset controls.
-3. Settings Screen: Clean list with toggles for daily reminders ("Daily Attitude" and "Meditation Time") with time selector pickers.
+1. Screen 1 — Home Screen:
+   - Header (Top): App title "MINDFULDAYS" in small uppercase label + subtitle "Atitude 3 de 9" + a single Settings gear IconButton on the top-right corner.
+   - Central ElevatedCard:
+     * Attitude title in bold headline: "Aceitação"
+     * Attitude description: "Reconheça e acolha o momento presente exatamente como ele é."
+     * A thin horizontal divider
+     * AI reflection text block: "Acolher o presente não é conformismo, é o ponto de partida para qualquer transformação real."
+     * Primary filled Button with sparkle icon: "✨ Nova Reflexão (Gemini IA)"
+   - Bottom Action: A single OutlinedButton spanning the width: "⏱️ Iniciar Timer de Meditação".
+   (DO NOT include: profile avatar, greetings, photo banners, audio player, streak tracker, or bottom navigation bar).
+
+2. Screen 2 — Meditation Timer Screen:
+   - TopAppBar: Title "Timer de Meditação" with a back navigation arrow.
+   - Center Area:
+     * Subtitle text: "Concentre-se na respiração"
+     * Single minimalist circular progress ring with large digital countdown text in center: "10:00" and a status text below: "Pausado".
+   - Bottom Controls: Exactly two buttons in a centered horizontal row:
+     * Reset OutlinedIconButton (circular refresh icon)
+     * Play/Pause large FilledIconButton (circular primary button with Play icon)
+   (DO NOT include: multiple dials, duration selector chips, interval bells, background sounds, or chime pickers).
+
+3. Screen 3 — Settings Screen:
+   - TopAppBar: Title "Configurações" with a back navigation arrow.
+   - Reminders Card (Surface):
+     * Row with text "Lembrete da Atitude Diária" and standard native Material 3 Switch (checked).
+     * Thin horizontal divider.
+     * Row with text "Lembrete para Meditar" and standard native Material 3 Switch (unchecked).
+   - Gemini API Card (Surface):
+     * Text label: "Chave de API do Gemini"
+     * Standard OutlinedTextField with placeholder "Cole sua API Key aqui..."
+     * Primary Button: "Salvar Chave"
+   (DO NOT include: time wheel dialogs, sound selectors, nested accordion cards, or multi-tab navigation).
 ```
 
 ---
