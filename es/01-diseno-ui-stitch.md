@@ -9,7 +9,7 @@ En este módulo, definiremos el flujo de pantallas de la app **MindfulDays** y u
 La aplicación cuenta con un flujo simple centrado en 3 pantallas:
 
 1. **Home Screen**: Muestra la fecha actual, la indicación de la actitud del día (en un ciclo de 1 a 9), tarjeta con frase reflexiva, botón de IA (*AI Sparkle*) para solicitar un consejo mediante la Gemini API y acceso directo al temporizador.
-2. **Timer Screen**: Contador regresivo circular y minimalista para meditación con controles de play, pause e reset.
+2. **Timer Screen**: Contador regresivo circular y minimalista para meditación con controles de play, pause y reset.
 3. **Settings Screen**: Opciones de recordatorios y notificaciones diarias con selector de hora.
 
 ---
@@ -35,20 +35,20 @@ IMPORTANT DESIGN SYSTEM CONSTRAINTS (STRICT):
 REQUIRED SCREENS & EXACT ELEMENTS:
 
 1. Screen 1 — Home Screen:
-   - Header (Top): App title "MINDFULDAYS" in small uppercase label + subtitle "Atitude 3 de 9" + a single Settings gear IconButton on the top-right corner.
+   - Header (Top): App title "MINDFULDAYS" in small uppercase label + subtitle "Actitud 3 de 9" + a single Settings gear IconButton on the top-right corner.
    - Central ElevatedCard:
-     * Attitude title in bold headline: "Aceitação"
-     * Attitude description: "Reconheça e acolha o momento presente exatamente como ele é."
+     * Attitude title in bold headline: "Aceptación"
+     * Attitude description: "Reconoce y acoge el momento presente exactamente como es."
      * A thin horizontal divider
-     * AI reflection text block: "Acolher o presente não é conformismo, é o ponto de partida para qualquer transformação real."
-     * Primary filled Button with sparkle icon: "✨ Nova Reflexão (Gemini IA)"
-   - Bottom Action: A single OutlinedButton spanning the width: "⏱️ Iniciar Timer de Meditação".
+     * AI reflection text block: "Acoger el presente no es conformismo, es el punto de partida para cualquier transformación real."
+     * Primary filled Button with sparkle icon: "✨ Nueva Reflexión (Gemini IA)"
+   - Bottom Action: A single OutlinedButton spanning the width: "⏱️ Iniciar Temporizador de Meditación".
    (DO NOT include: profile avatar, greetings, photo banners, audio player, streak tracker, or bottom navigation bar).
 
 2. Screen 2 — Meditation Timer Screen:
-   - TopAppBar: Title "Timer de Meditação" with a back navigation arrow.
+   - TopAppBar: Title "Temporizador de Meditación" with a back navigation arrow.
    - Center Area:
-     * Subtitle text: "Concentre-se na respiração"
+     * Subtitle text: "Concéntrate en la respiración"
      * Single minimalist circular progress ring with large digital countdown text in center: "10:00" and a status text below: "Pausado".
    - Bottom Controls: Exactly two buttons in a centered horizontal row:
      * Reset OutlinedIconButton (circular refresh icon)

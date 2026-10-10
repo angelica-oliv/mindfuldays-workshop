@@ -32,7 +32,7 @@ Ao criar o projeto, preencha os parâmetros fundamentais:
 Abra o painel do **Gemini** no Android Studio (**View → Tool Windows → Gemini**) ou utilize a janela **Create with AI**. Anexe as capturas de tela geradas no **Stitch** e cole o seguinte prompt estruturado e prescritivo:
 
 > [!TIP]
-> **Por que um prompt prescritivo?** Ao guiar a IA especificando os componentes nativos exatos do Material 3, a tipografia padrão do sistema e as 3 telas sem elementos supérfluos, o código gerado no Android Studio terá fidelidade visual idêntica ao design do Stitch e compilará de forma limpa, sem dependências externas nem complexidade desnecessária em sala de aula. A chave da API do Gemini nunca deve ser exposta na interface do usuário (UI), sendo lida com segurança via `local.properties` e `BuildConfig`.
+> **Por que um prompt prescritivo e com classes em esqueleto?** Ao guiar a IA especificando os componentes nativos exatos do Material 3, a tipografia padrão do sistema e as 3 telas sem elementos supérfluos, o código gerado no Android Studio terá fidelidade visual idêntica ao design do Stitch. Além disso, ao instruir a IA a gerar classes como `GeminiApiService` e `AttitudeRepository` como esqueletos em branco (*stubs* com TODOs), garantimos que o projeto compile imediatamente com telas funcionais, reservando a lógica de negócio e integração da API Gemini para serem construídas passo a passo pelos alunos nos módulos seguintes. A chave da API do Gemini nunca deve ser exposta na interface do usuário (UI), sendo lida com segurança via `local.properties` e `BuildConfig`.
 
 ```text
 You are an expert Android developer. Create a minimalist Android application named 'MindfulDays' with package name 'dev.mindfuldays.app' using Jetpack Compose and Material Design 3.
@@ -89,27 +89,8 @@ IMPLEMENT EXACTLY THESE 3 SCREENS (no more, no less):
        - Text "Versão 1.0 • 9 Atitudes de Jon Kabat-Zinn" (bodyMedium, muted).
    - STRICT EXCLUSIONS: Absolutely NO Gemini API key input field in the UI! (The API key is securely provided via local.properties and BuildConfig.GEMINI_API_KEY in code, never typed by the user in UI). Do NOT include time picker wheel dialogs, sound options, or nested accordions.
 
-CORE ARCHITECTURE & CODE REQUIREMENTS:
-- Package: dev.mindfuldays.app
-- Clean Architecture with MVVM pattern (MindfulnessViewModel + StateFlow).
-- Material Design 3 Theme in ui/theme/ (Color.kt, Theme.kt, Type.kt using system sans-serif fonts).
-- Repository & Remote Service:
-  * Model: MindfulnessAttitude (id, name, description, dailyReflection).
-  * Repository: AttitudeRepository with the 9 Jon Kabat-Zinn attitudes.
-  * Remote Service: GeminiApiService configured using BuildConfig.GEMINI_API_KEY (from local.properties).
-- Navigation: Standard Compose navigation (or state-driven screen switching) connecting Home, Timer, and Settings.
-- Localization: res/values/strings.xml for clean UI text.
-
-Write clean, concise, idiomatic Kotlin and Jetpack Compose code with no unnecessary dependencies.
-```
-
----
-
-## 📁 2.4. Visão da Estrutura de Pacotes do Projeto
-
-Após a execução do prompt e geração inicial, seu projeto em `dev.mindfuldays.app` estará organizado da seguinte forma:
-
-```text
+EXPECTED FINAL PACKAGE STRUCTURE:
+Organize all generated code cleanly under the root package 'dev.mindfuldays.app':
 dev.mindfuldays.app/
 ├── data/
 │   ├── model/
@@ -132,6 +113,64 @@ dev.mindfuldays.app/
 │   └── viewmodel/
 │       └── MindfulnessViewModel.kt
 └── MainActivity.kt
+
+INITIAL IMPLEMENTATION STATUS (WORKSHOP PROGRESSION & BLANK SKELETON CLASSES):
+Since this project will be built progressively across workshop modules, generate classes with the following implementation levels:
+
+1. FULLY IMPLEMENTED NOW (UI & Design Tokens):
+   - ui/theme/ (Color.kt, Theme.kt, Type.kt): Fully implemented with the required Material 3 color tokens and system fonts.
+   - ui/home/HomeScreen.kt, ui/timer/TimerScreen.kt, ui/settings/SettingsScreen.kt: Fully implement the declarative Composable layouts according to the exact screen specifications above.
+   - data/model/MindfulnessAttitude.kt: Data class fully defined:
+     data class MindfulnessAttitude(val id: Int, val name: String, val description: String, val dailyReflection: String)
+   - MainActivity.kt: Simple state-based navigation switching between HomeScreen, TimerScreen, and SettingsScreen.
+
+2. GENERATE AS EMPTY SKELETONS / STUBS (TO BE FILLED IN SUBSEQUENT WORKSHOP STEPS):
+   - data/remote/GeminiApiService.kt: Generate as a BLANK/EMPTY interface skeleton with a simple stub and a TODO comment (do NOT implement API calls yet, students will implement this in Module 3):
+     // TODO: Implement Google Gemini API call with generativeai SDK in Module 3
+     interface GeminiApiService {
+         suspend fun generateDailyReflection(attitude: String): String = ""
+     }
+   - data/repository/AttitudeRepository.kt: Generate as a SKELETON class stub with placeholder method signatures and a TODO comment:
+     // TODO: Implement 9 Jon Kabat-Zinn attitudes & offline fallback logic in Module 3
+     class AttitudeRepository(private val apiService: GeminiApiService? = null) {
+         fun getAttitudeOfTheDay(): MindfulnessAttitude = MindfulnessAttitude(1, "Aceitação", "Reconheça e acolha o momento presente.", "Reflexão inicial.")
+         suspend fun getAiReflection(attitude: String): String = "Reflexão temporária de exemplo."
+     }
+   - ui/viewmodel/MindfulnessViewModel.kt: Generate as an INITIAL SKELETON ViewModel with basic StateFlow and placeholder state values just enough to preview and run the UI without crashing:
+     // TODO: Bind coroutines, offline caching and real Gemini API integration in Module 3
+
+Write clean, concise, idiomatic Kotlin and Jetpack Compose code with no unnecessary dependencies.
+```
+
+---
+
+## 📁 2.4. Visão da Estrutura de Pacotes do Projeto
+
+Após a execução do prompt e geração inicial, seu projeto em `dev.mindfuldays.app` estará organizado da seguinte forma:
+
+```text
+dev.mindfuldays.app/
+├── data/
+│   ├── model/
+│   │   └── MindfulnessAttitude.kt    <- Data class com os atributos da atitude
+│   ├── remote/
+│   │   └── GeminiApiService.kt       <- Esqueleto / Stub vazio (implementado no Módulo 3)
+│   └── repository/
+│       └── AttitudeRepository.kt     <- Esqueleto com assinaturas (implementado no Módulo 3)
+├── ui/
+│   ├── home/
+│   │   └── HomeScreen.kt             <- Layout Compose completo e funcional
+│   ├── timer/
+│   │   └── TimerScreen.kt            <- Layout Compose completo e funcional
+│   ├── settings/
+│   │   └── SettingsScreen.kt         <- Layout Compose completo e funcional
+│   ├── theme/
+│   │   ├── Color.kt                  <- Tokens Material 3 oficiais (Sálvia, Areia, Off-White)
+│   │   ├── Theme.kt
+│   │   └── Type.kt
+│   └── viewmodel/
+│       └── MindfulnessViewModel.kt   <- Esqueleto inicial de estado para a UI
+└── MainActivity.kt                   <- Ponto de entrada e navegação básica entre as telas
 ```
 
 Com a estrutura do projeto sincronizada e compilando no **Android Studio Stable**, avançamos para o **Módulo 3: Diretrizes com AGENTS.md, Implementação da UI em Compose e Integração com Gemini API**.
