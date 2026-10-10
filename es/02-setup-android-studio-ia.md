@@ -29,26 +29,78 @@ Al crear el proyecto, completa los parámetros fundamentales:
 
 ## 🤖 2.3. Prompt Multimodal para Gemini en Android Studio
 
-Abre el panel de **Gemini** en Android Studio (**View → Tool Windows → Gemini**) o utiliza la ventana **Create with AI**. Adjunta las capturas de pantalla generadas en **Stitch** y pega el siguiente prompt estructurado:
+Abre el panel de **Gemini** en Android Studio (**View → Tool Windows → Gemini**) o utiliza la ventana **Create with AI**. Adjunta las capturas de pantalla generadas en **Stitch** y pega el siguiente prompt estructurado y prescriptivo:
+
+> [!TIP]
+> **¿Por qué un prompt prescriptivo?** Al guiar a la IA especificando los componentes nativos exactos de Material 3, la tipografía estándar del sistema y las 3 pantallas sin elementos superfluos, el código generado en Android Studio tendrá fidelidad visual idéntica al diseño de Stitch y compilará limpiamente, sin dependencias externas ni complejidades innecesarias en el aula. La clave de API de Gemini nunca debe exponerse en la interfaz de usuario (UI), leyéndose de forma segura a través de `local.properties` y `BuildConfig`.
 
 ```text
-Create a modern Android application named 'MindfulDays' with package name 'dev.mindfuldays.app' using Jetpack Compose and Material Design 3.
+You are an expert Android developer. Create a minimalist Android application named 'MindfulDays' with package name 'dev.mindfuldays.app' using Jetpack Compose and Material Design 3.
 
-Using the attached UI screenshots generated in Stitch as the visual source of truth, implement the following screens and functionality:
+Use the attached Stitch UI screenshots as the exact visual reference and follow these prescriptive rules:
+- UI STYLE & TYPOGRAPHY: Strict minimalist design for a workshop tutorial. Use Android system fonts ONLY (default sans-serif / Roboto). Use native Android Material 3 components ONLY (Button, OutlinedButton, FilledIconButton, OutlinedIconButton, ElevatedCard, Card, TopAppBar, Switch, HorizontalDivider). Do NOT create complex custom UI components.
+- COLOR PALETTE:
+  * Primary: Sage Green (#6B8E23)
+  * Secondary / Divider: Muted Sand (#E8DFD8)
+  * Background: Warm Off-White (#FBF9F5)
+  * Surface / Cards: Pure White (#FFFFFF)
+  * OnBackground / Text: Dark Forest Green (#2C3E35)
 
-1. Home Screen: Implement a dashboard with a soft sage green (#6B8E23) and warm off-white (#FBF9F5) color palette. Include a top header displaying the current date and the 'Attitude of the Day' (cycling through 9 Jon Kabat-Zinn mindfulness attitudes). Place a central elevated card for daily AI reflections with a prompt button, and a bottom action to open the Timer.
+IMPLEMENT EXACTLY THESE 3 SCREENS (no more, no less):
 
-2. Meditation Timer Screen: Implement a circular countdown timer starting at 10:00. Add Play, Pause, and Reset controls with clean Material 3 IconButton composables.
+1. Screen 1: Home Screen (HomeScreen.kt)
+   - Layout: Column with background #FBF9F5, vertical arrangement spaced between.
+   - Header (Top):
+     * A top Row containing:
+       - Centered column: App title "MINDFULDAYS" (MaterialTheme.typography.labelLarge, primary color) and subtitle "Atitude X de 9" (bodyMedium, muted).
+       - Top-right corner: Standard IconButton with Icons.Default.Settings to navigate to SettingsScreen.
+   - Central Card (ElevatedCard):
+     * Container color white, elevation 4.dp, padded content.
+     * Attitude title in bold (headlineMedium, e.g., "Aceitação").
+     * Attitude description (bodyLarge, e.g., "Reconheça e acolha o momento presente exatamente como ele é.").
+     * Thin HorizontalDivider (color #E8DFD8).
+     * AI reflection text block (bodyMedium, italic, displaying generated reflection or default).
+     * Primary filled Button with sparkle icon: "✨ Nova Reflexão (Gemini IA)". Shows CircularProgressIndicator when loading.
+   - Bottom Action:
+     * A single full-width OutlinedButton: "⏱️ Iniciar Timer de Meditação" navigating to TimerScreen.
+   - STRICT EXCLUSIONS: Do NOT include bottom navigation bars, profile avatars, greetings, photo banners, audio players, or habit/streak charts.
 
-3. Settings Screen: Implement switches for 'Daily Attitude Reminder' and 'Meditation Time' with TimePicker dialogs for scheduling local notifications.
+2. Screen 2: Meditation Timer Screen (TimerScreen.kt)
+   - TopAppBar: Title "Timer de Meditação" with back navigation arrow (Icons.AutoMirrored.Filled.ArrowBack).
+   - Center Area:
+     * Subtitle text: "Concentre-se na respiração" (bodyLarge, muted color).
+     * Minimalist circular countdown timer: A clean circular progress ring (Canvas drawArc with stroke width 8.dp: track color #E8DFD8, progress color #6B8E23), large digital countdown text centered inside ("10:00" or mm:ss in headlineLarge/displayMedium), and status text below ("Pausado" / "Em andamento" / "Concluído").
+   - Bottom Controls:
+     * A centered horizontal Row with exactly two buttons:
+       - Reset button: OutlinedIconButton with Icons.Default.Refresh.
+       - Play/Pause button: Large FilledIconButton with primary container color and Play/Pause icon.
+   - STRICT EXCLUSIONS: Do NOT include multiple timer dials, duration selector chips/pills, background nature sounds, audio pickers, or interval chime settings.
 
-Core Architecture Requirements:
-- Use Clean Architecture with MVVM pattern (ViewModel + StateFlow).
-- Implement Material Design 3 Theme in ui/theme/ (Color.kt, Theme.kt, Type.kt).
-- Create a service interface GeminiApiService for fetching reflections via Google Gemini API.
-- Prepare string resources in res/values/strings.xml for Portuguese and English localization.
+3. Screen 3: Settings Screen (SettingsScreen.kt)
+   - TopAppBar: Title "Configurações" with back navigation arrow (Icons.AutoMirrored.Filled.ArrowBack).
+   - Section "Lembretes Diários" (titleMedium, primary color):
+     * Card (containerColor surface, elevation 2.dp) containing:
+       - Row: Text "Lembrete da Atitude Diária" + standard Material 3 Switch (checked by default).
+       - Thin HorizontalDivider.
+       - Row: Text "Lembrete para Meditar" + standard Material 3 Switch (unchecked by default).
+   - Section "Sobre o App" (titleMedium, primary color):
+     * Card (containerColor surface, elevation 2.dp) containing:
+       - Text "MindfulDays" (titleMedium bold).
+       - Text "Versão 1.0 • 9 Atitudes de Jon Kabat-Zinn" (bodyMedium, muted).
+   - STRICT EXCLUSIONS: Absolutely NO Gemini API key input field in the UI! (The API key is securely provided via local.properties and BuildConfig.GEMINI_API_KEY in code, never typed by the user in UI). Do NOT include time picker wheel dialogs, sound options, or nested accordions.
 
-Ensure code is written in clean, idiomatic Kotlin using jetpack compose state management.
+CORE ARCHITECTURE & CODE REQUIREMENTS:
+- Package: dev.mindfuldays.app
+- Clean Architecture with MVVM pattern (MindfulnessViewModel + StateFlow).
+- Material Design 3 Theme in ui/theme/ (Color.kt, Theme.kt, Type.kt using system sans-serif fonts).
+- Repository & Remote Service:
+  * Model: MindfulnessAttitude (id, name, description, dailyReflection).
+  * Repository: AttitudeRepository with the 9 Jon Kabat-Zinn attitudes.
+  * Remote Service: GeminiApiService configured using BuildConfig.GEMINI_API_KEY (from local.properties).
+- Navigation: Standard Compose navigation (or state-driven screen switching) connecting Home, Timer, and Settings.
+- Localization: res/values/strings.xml for clean UI text.
+
+Write clean, concise, idiomatic Kotlin and Jetpack Compose code with no unnecessary dependencies.
 ```
 
 ---
