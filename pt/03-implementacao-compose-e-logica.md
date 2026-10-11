@@ -162,6 +162,13 @@ dependencies {
 
 ### 4. Atestação de Segurança com Firebase App Check (Código e Debug Token)
 
+#### 🛡️ Por que estamos fazendo isso?
+1. **Proteção da IA e Recursos em Nuvem:** Chamadas à API Gemini (via Firebase AI Logic / Vertex AI in Firebase) e serviços de nuvem envolvem cotas e cobrança. O **Firebase App Check** adiciona uma camada essencial de proteção, garantindo que **apenas instâncias legítimas do seu aplicativo**, instaladas em dispositivos autênticos e não modificados, consigam consumir a API de IA. Ele bloqueia bots, ataques de negação de serviço (DoS), clonagem de requisições e acessos de terceiros que tentem usar sua cota de IA.
+2. **Por que precisamos do Debug Token em desenvolvimento local?**
+   - Em produção, o App Check utiliza o **Google Play Integrity** para validar automaticamente a assinatura do app e a integridade do dispositivo Android via Google Play Store.
+   - Em desenvolvimento local (no Android Studio, via emulador ou cabo USB), o aplicativo ainda não foi assinado com as chaves de produção da Play Store nem distribuído pela loja. Logo, o Play Integrity não consegue atestar o ambiente de desenvolvimento.
+   - O **Debug Provider** (`DebugAppCheckProviderFactory`) resolve isso: ele gera um token único (UUID) no Logcat do seu ambiente local. Quando você registra esse token no Firebase Console, o Firebase autoriza especificamente a sua máquina ou emulador a realizar chamadas de IA sem desabilitar a proteção para o restante do mundo.
+
 > [!IMPORTANT]
 > **Por que o Logcat não exibe o token automaticamente?**
 > O Firebase App Check **não é ativado apenas adicionando a dependência no Gradle**. É indispensável inicializar o Firebase e instalar a fábrica do provedor de debug (`DebugAppCheckProviderFactory`) no código Kotlin do seu aplicativo. Sem isso, a fábrica de debug nunca é executada e nenhuma mensagem é emitida no Logcat.
@@ -215,32 +222,42 @@ Em seguida, registre sua classe Application no `app/src/main/AndroidManifest.xml
 > }
 > ```
 
-Agora, ao compilar e executar o app:
-1. Execute o aplicativo no Android Studio (em um emulador ou aparelho físico).
-2. Abra a aba **Logcat** e filtre pelo termo `DebugAppCheckProvider`.
-3. Você verá no console a mensagem com o token de debug gerado:
-   ```text
-   D/DebugAppCheckProvider: Enter this debug secret into the allow list in the Firebase Console for your project: a8c2dd4c-7f7f-4764-b653-ef6c114ba27e
-   ```
-4. Copie o token secreto e registre-o no **Firebase Console** em **App Check** → **Apps** → **Manage Debug Tokens**.
+#### 📋 Passo a Passo para Obter e Registrar o Debug Token no Firebase Console:
+
+1. **Obter o Token no Android Studio:**
+   - Execute o aplicativo no Android Studio (em um emulador ou aparelho físico).
+   - Abra a aba **Logcat** e filtre pelo termo `DebugAppCheckProvider`.
+   - Você verá no console a mensagem com o token de debug gerado:
+     ```text
+     D/DebugAppCheckProvider: Enter this debug secret into the allow list in the Firebase Console for your project: a8c2dd4c-7f7f-4764-b653-ef6c114ba27e
+     ```
+   - Copie o código UUID exibido (ex: `a8c2dd4c-7f7f-4764-b653-ef6c114ba27e`).
+
+2. **Cadastrar no Firebase Console:**
+   - Acesse o [Firebase Console](https://console.firebase.google.com/) e selecione o seu projeto.
+   - No menu lateral esquerdo, navegue até **App Check** (na seção *Build* ou *Segurança*).
+   - Clique na aba **Apps** (Aplicativos).
+   - Localize a linha correspondente ao seu app Android (`dev.mindfuldays.app`).
+   - **Não clique em configurar provedores na tabela!** Em vez disso, clique no **menu de 3 pontinhos verticais (`⋮`)** na extremidade direita da linha do app.
+   - Selecione a opção **Manage debug tokens** (*Gerenciar tokens de depuração*).
+   - Clique em **Add debug token** (*Adicionar token de depuração*).
+   - Defina um nome identificador (ex: `Meu Emulador Local`) e cole o UUID copiado do Logcat.
+   - Clique em **Save** (*Salvar*).
+
+> [!CAUTION]
+> **Cuidado com Provedores Incorretos:**
+> - **Não selecione Fraud Defense (formerly known as reCAPTCHA Enterprise):** Esta opção é voltada exclusivamente para aplicações **Web**.
+> - Em desenvolvimento local, não configure o Play Integrity ainda; utilize apenas o **Debug Token** pelo menu de 3 pontinhos (`⋮`).
+> - Em produção na Play Store, o provedor correto para Android será o **Play Integrity**.
 
 ---
 
-## 🧠 3.3. Modelo de Dados e Calculador das 9 Atitudes
+## 🧠 3.3. Repositório e Calculador das 9 Atitudes
 
-Crie a data class em `dev/mindfuldays/app/data/model/MindfulnessAttitude.kt`:
+> [!NOTE]
+> A data class `MindfulnessAttitude` já foi definida na estrutura inicial do projeto em `dev/mindfuldays/app/data/model/MindfulnessAttitude.kt`.
 
-```kotlin
-package dev.mindfuldays.app.data.model
-
-data class MindfulnessAttitude(
-    val id: Int,
-    val title: String,
-    val description: String
-)
-```
-
-Crie o repositório em `dev/mindfuldays/app/data/repository/AttitudeRepository.kt`:
+Agora, implemente a classe de repositório em `dev/mindfuldays/app/data/repository/AttitudeRepository.kt`:
 
 ```kotlin
 package dev.mindfuldays.app.data.repository
