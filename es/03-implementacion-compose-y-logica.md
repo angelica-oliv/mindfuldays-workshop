@@ -160,13 +160,67 @@ dependencies {
 }
 ```
 
-### 4. Atestación de Seguridad con Firebase App Check (Debug Token)
-Siguiendo la guía de JetPacker, para probar la comunicación de IA en un entorno de desarrollo local (emulador o dispositivo físico):
-1. Ejecuta la aplicación en Android Studio.
+### 4. Atestación de Seguridad con Firebase App Check (Código y Debug Token)
+
+> [!IMPORTANT]
+> **¿Por qué Logcat no muestra el token automáticamente?**
+> Firebase App Check **no se activa únicamente agregando la dependencia en Gradle**. Es indispensable inicializar Firebase e instalar la fábrica de proveedores de depuración (`DebugAppCheckProviderFactory`) en el código Kotlin de tu aplicación. Sin esto, la fábrica de depuración nunca se ejecuta y no se emite ningún mensaje en Logcat.
+
+Crea el archivo `dev/mindfuldays/app/MindfulDaysApplication.kt` (idéntico a [JetPackerApplication](https://github.com/android/ai-samples/blob/main/jetpacker/android/app/src/main/kotlin/com/example/jetpacker/JetPackerApplication.kt) del repositorio oficial de Google):
+
+```kotlin
+package dev.mindfuldays.app
+
+import android.app.Application
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.initialize
+
+class MindfulDaysApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+        
+        // 1. Inicializa Firebase con el contexto de la aplicación
+        Firebase.initialize(context = this)
+
+        // 2. Instala la fábrica del proveedor de debug (genera el token en Logcat)
+        Firebase.appCheck.installAppCheckProviderFactory(
+            DebugAppCheckProviderFactory.getInstance()
+        )
+    }
+}
+```
+
+Luego, registra tu clase Application en `app/src/main/AndroidManifest.xml`:
+
+```xml
+<application
+    android:name=".MindfulDaysApplication"
+    android:label="@string/app_name"
+    android:icon="@mipmap/ic_launcher"
+    ... >
+```
+
+> [!TIP]
+> **Alternativa Rápida (Directamente en MainActivity):**
+> Si prefieres no crear una clase Application separada, también puedes agregar estas dos líneas directamente al inicio del método `onCreate()` de tu `MainActivity.kt`:
+> ```kotlin
+> override fun onCreate(savedInstanceState: Bundle?) {
+>     super.onCreate(savedInstanceState)
+>     Firebase.initialize(context = this)
+>     Firebase.appCheck.installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance())
+>     ...
+> }
+> ```
+
+Ahora sí, al compilar y ejecutar la app:
+1. Ejecuta la aplicación en Android Studio (en un emulador o dispositivo físico).
 2. Abre la pestaña **Logcat** y filtra por el término `DebugAppCheckProvider`.
-3. Verás una línea de log similar a:
+3. Verás en la consola el mensaje con el token de debug generado:
    ```text
-   Enter this debug secret into the allow list in the Firebase Console for your project: a8c2dd4c-7f7f-4764-b653-ef6c114ba27e
+   D/DebugAppCheckProvider: Enter this debug secret into the allow list in the Firebase Console for your project: a8c2dd4c-7f7f-4764-b653-ef6c114ba27e
    ```
 4. Copia el token secreto y regístralo en **Firebase Console** en **App Check** → **Apps** → **Manage Debug Tokens**.
 
