@@ -172,54 +172,7 @@ Siguiendo la guía de JetPacker, para probar la comunicación de IA en un entorn
 
 ---
 
-## 🎨 3.3. Configuración del Tema y Tokens en Compose
-
-Crea el archivo `dev/mindfuldays/app/ui/theme/Color.kt`:
-
-```kotlin
-package dev.mindfuldays.app.ui.theme
-
-import androidx.compose.ui.graphics.Color
-
-val SageGreen = Color(0xFF6B8E23)
-val SageGreenLight = Color(0xFF8FA853)
-val SandMuted = Color(0xFFE8DFD8)
-val WarmOffWhite = Color(0xFFFBF9F5)
-val ForestDark = Color(0xFF2C3E35)
-val PureWhite = Color(0xFFFFFFFF)
-```
-
-Crea el archivo `dev/mindfuldays/app/ui/theme/Theme.kt`:
-
-```kotlin
-package dev.mindfuldays.app.ui.theme
-
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
-
-private val LightColorScheme = lightColorScheme(
-    primary = SageGreen,
-    secondary = SandMuted,
-    background = WarmOffWhite,
-    surface = PureWhite,
-    onPrimary = PureWhite,
-    onBackground = ForestDark,
-    onSurface = ForestDark
-)
-
-@Composable
-fun MindfulDaysTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = LightColorScheme,
-        content = content
-    )
-}
-```
-
----
-
-## 🧠 3.4. Modelo de Datos y Calculador de las 9 Actitudes
+## 🧠 3.3. Modelo de Datos y Calculador de las 9 Actitudes
 
 Crea la data class en `dev/mindfuldays/app/data/model/MindfulnessAttitude.kt`:
 
@@ -265,7 +218,7 @@ class AttitudeRepository {
 
 ---
 
-## 🤖 3.5. Integración con Gemini API usando Firebase AI Logic (Patrón Museum Assistant con Gemini 3.5 flash-lite)
+## 🤖 3.4. Integración con Gemini API usando Firebase AI Logic (Patrón Museum Assistant con Gemini 3.5 flash-lite)
 
 En el proyecto de referencia [JetPacker (Museum Assistant)](https://github.com/android/ai-samples/tree/main/jetpacker), la integración con Gemini se realiza a través de **Firebase AI Logic** con el modelo **`gemini-3.5-flash-lite`** y `GenerativeBackend.googleAI()`.
 
@@ -376,7 +329,7 @@ class MindfulnessViewModel(
 
 ---
 
-## 📱 3.6. Implementando la Home Screen en Jetpack Compose
+## 📱 3.5. Implementando la Home Screen en Jetpack Compose
 
 Crea el archivo en `dev/mindfuldays/app/ui/home/HomeScreen.kt`:
 
