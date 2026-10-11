@@ -407,102 +407,166 @@ Crea el archivo en `dev/mindfuldays/app/ui/home/HomeScreen.kt`:
 ```kotlin
 package dev.mindfuldays.app.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.mindfuldays.app.data.model.MindfulnessAttitude
+import dev.mindfuldays.app.ui.viewmodel.MindfulnessViewModel
 
 @Composable
 fun HomeScreen(
+    viewModel: MindfulnessViewModel,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToTimer: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    HomeScreenContent(
+        attitude = uiState.attitude,
+        aiReflection = uiState.aiReflection,
+        isLoadingAi = uiState.isLoadingAi,
+        onGenerateAiReflection = { viewModel.generateAiReflection() },
+        onNavigateToSettings = onNavigateToSettings,
+        onNavigateToTimer = onNavigateToTimer,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun HomeScreenContent(
     attitude: MindfulnessAttitude,
     aiReflection: String,
     isLoadingAi: Boolean,
     onGenerateAiReflection: () -> Unit,
-    onNavigateToTimer: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToTimer: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFFBF9F5))
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+        // Encabezado (Top Bar)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Header
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.size(48.dp))
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = "MINDFULDAYS",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color(0xFF6B8E23),
+                    fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Actitud ${attitude.id} de 9",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Configuración"
+                )
+            }
+        }
 
-            // Tarjeta Central
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        // Tarjeta Central (ElevatedCard)
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color(0xFFFFFFFF)
+            ),
+            elevation = CardDefaults.elevatedCardElevation(
+                defaultElevation = 4.dp
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        text = attitude.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = attitude.description,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Divider(color = MaterialTheme.colorScheme.secondary)
-                    Spacer(modifier = Modifier.height(16.dp))
-
+                Text(
+                    text = attitude.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = attitude.description,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                HorizontalDivider(
+                    color = Color(0xFFE8DFD8),
+                    thickness = 1.dp
+                )
+                Text(
+                    text = if (aiReflection.isNotBlank()) aiReflection else "“Respira profundo y trae tu atención al momento presente.”",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = onGenerateAiReflection,
+                    enabled = !isLoadingAi,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     if (isLoadingAi) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            color = MaterialTheme.colorScheme.primary
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
                         )
                     } else {
-                        Text(
-                            text = if (aiReflection.isNotBlank()) aiReflection else "Haz clic abajo para generar una reflexión con IA.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
                         )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = onGenerateAiReflection,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("✨ Nueva Reflexión (Gemini IA)")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "✨ Nueva Reflexión (Gemini IA)")
                     }
                 }
             }
+        }
 
-            // Acción de Navegación hacia el Temporizador
-            OutlinedButton(
-                onClick = onNavigateToTimer,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("⏱️ Iniciar Temporizador de Meditación")
-            }
+        // Acción de Navegación hacia el Temporizador
+        OutlinedButton(
+            onClick = onNavigateToTimer,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(
+                text = "⏱️ Iniciar Temporizador de Meditación",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

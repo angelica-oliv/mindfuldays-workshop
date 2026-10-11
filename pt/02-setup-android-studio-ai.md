@@ -120,24 +120,57 @@ Since this project will be built progressively across workshop modules, generate
 1. FULLY IMPLEMENTED NOW (UI & Design Tokens):
    - ui/theme/ (Color.kt, Theme.kt, Type.kt): Fully implemented with the required Material 3 color tokens and system fonts.
    - ui/home/HomeScreen.kt, ui/timer/TimerScreen.kt, ui/settings/SettingsScreen.kt: Fully implement the declarative Composable layouts according to the exact screen specifications above.
-   - data/model/MindfulnessAttitude.kt: Data class fully defined:
-     data class MindfulnessAttitude(val id: Int, val name: String, val description: String, val dailyReflection: String)
-   - MainActivity.kt: Simple state-based navigation switching between HomeScreen, TimerScreen, and SettingsScreen.
+     * In HomeScreen.kt, implement a stateful 'HomeScreen(viewModel: MindfulnessViewModel, onNavigateToSettings: () -> Unit, onNavigateToTimer: () -> Unit)' that collects 'viewModel.uiState' with lifecycle and delegates to a stateless 'HomeScreenContent'.
+   - data/model/MindfulnessAttitude.kt: Data class fully defined with attributes id, title, and description:
+     data class MindfulnessAttitude(val id: Int, val title: String, val description: String)
+   - MainActivity.kt: Instantiates 'viewModel: MindfulnessViewModel = viewModel()' and performs simple state-based navigation between HomeScreen, TimerScreen, and SettingsScreen.
 
-2. GENERATE AS EMPTY SKELETONS / STUBS (TO BE FILLED IN SUBSEQUENT WORKSHOP STEPS):
-   - data/remote/GeminiApiService.kt: Generate as a BLANK/EMPTY interface skeleton with a simple stub and a TODO comment (do NOT implement API calls yet, students will implement this in Module 3):
-     // TODO: Implement Google Gemini API call with generativeai SDK in Module 3
-     interface GeminiApiService {
-         suspend fun generateDailyReflection(attitude: String): String = ""
+2. GENERATE AS EMPTY SKELETONS / STUBS (TO BE FILLED IN SUBSEQUENT WORKSHOP MODULE 3):
+   - data/remote/GeminiApiService.kt: Generate as a SKELETON class stub with a placeholder method and a TODO comment (students will implement this with Firebase AI Logic in Module 3):
+     // TODO: Implement Google Gemini API call with Firebase AI Logic in Module 3
+     class GeminiApiService {
+         suspend fun generateReflection(attitudeTitle: String): String = "Respire fundo e traga sua atenção para o momento presente."
      }
-   - data/repository/AttitudeRepository.kt: Generate as a SKELETON class stub with placeholder method signatures and a TODO comment:
-     // TODO: Implement 9 Jon Kabat-Zinn attitudes & offline fallback logic in Module 3
-     class AttitudeRepository(private val apiService: GeminiApiService? = null) {
-         fun getAttitudeOfTheDay(): MindfulnessAttitude = MindfulnessAttitude(1, "Aceitação", "Reconheça e acolha o momento presente.", "Reflexão inicial.")
-         suspend fun getAiReflection(attitude: String): String = "Reflexão temporária de exemplo."
+   - data/repository/AttitudeRepository.kt: Generate as a SKELETON class stub with the exact method signature expected in Module 3 and a TODO comment:
+     // TODO: Implement 9 Jon Kabat-Zinn attitudes & daily rotation in Module 3
+     class AttitudeRepository {
+         fun getTodayAttitude(): MindfulnessAttitude = MindfulnessAttitude(
+             id = 3,
+             title = "Aceitação",
+             description = "Reconheça e acolha o momento presente exatamente como ele é."
+         )
      }
-   - ui/viewmodel/MindfulnessViewModel.kt: Generate as an INITIAL SKELETON ViewModel with basic StateFlow and placeholder state values just enough to preview and run the UI without crashing:
-     // TODO: Bind coroutines, offline caching and real Gemini API integration in Module 3
+   - ui/viewmodel/MindfulnessViewModel.kt: Generate as an INITIAL SKELETON ViewModel with MindfulnessUiState (attitude, aiReflection, isLoadingAi) and StateFlow matching Module 3:
+     // TODO: Connect Firebase AI Logic and real Gemini API integration in Module 3
+     data class MindfulnessUiState(
+         val attitude: MindfulnessAttitude,
+         val aiReflection: String = "“Acolher o presente não é conformismo, é o ponto de partida para qualquer transformação real.”",
+         val isLoadingAi: Boolean = false
+     )
+
+     class MindfulnessViewModel(
+         private val repository: AttitudeRepository = AttitudeRepository(),
+         private val geminiService: GeminiApiService = GeminiApiService()
+     ) : ViewModel() {
+         private val _uiState = MutableStateFlow(
+             MindfulnessUiState(attitude = repository.getTodayAttitude())
+         )
+         val uiState: StateFlow<MindfulnessUiState> = _uiState.asStateFlow()
+
+         fun generateAiReflection() {
+             viewModelScope.launch {
+                 _uiState.update { it.copy(isLoadingAi = true) }
+                 delay(1000) // Simulated delay for UI preview
+                 val reflection = geminiService.generateReflection(_uiState.value.attitude.title)
+                 _uiState.update {
+                     it.copy(
+                         aiReflection = reflection,
+                         isLoadingAi = false
+                     )
+                 }
+             }
+         }
+     }
 
 Write clean, concise, idiomatic Kotlin and Jetpack Compose code with no unnecessary dependencies.
 ```
