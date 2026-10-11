@@ -61,10 +61,11 @@ Respeite estritamente a paleta de cores definida nos protótipos do Google Stitc
 ## 🧠 Regras de Negócio Fundamentais
 1. **Regra das 9 Atitudes**: A lista contém exatamente 9 atitudes fixas. O cálculo da atitude diária deve usar o dia do ano:
    `val index = (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) - 1) % 9`
-2. **Gemini API (Reflexões Diárias)**:
-   - Utilizar o endpoint do modelo `gemini-1.5-flash:generateContent`.
+2. **Gemini API com Firebase AI Logic**:
+   - Utilizar a biblioteca oficial `com.google.firebase:firebase-ai` com o backend `GenerativeBackend.googleAI()`.
+   - Utilizar o modelo mais recente: `gemini-3.5-flash-lite`.
    - Gerar reflexões concisas e inspiradoras com no máximo 2 frases para cada atitude.
-   - Tratar ausência de chave de API e erros de rede com fallback amigável offline sem quebrar o app.
+   - Tratar ausência de conexão e exceções com fallback amigável offline sem quebrar o app.
 
 ## 🛠️ Comandos de Verificação e Validação
 Sempre verifique as alterações utilizando os seguintes comandos no terminal:
@@ -73,7 +74,7 @@ Sempre verifique as alterações utilizando os seguintes comandos no terminal:
 - **Linter & Análise Estática**: `./gradlew lintDebug`
 
 ## 🚫 Restrições Rígidas (Guardrails)
-- **NUNCA** faça hardcode de credenciais ou chaves de API (`apiKey`) no código versionado.
+- **NUNCA** faça hardcode de credenciais ou chaves de API (`apiKey`) no código. A autenticação é gerenciada com segurança pelo Firebase via `google-services.json` e Firebase App Check.
 - **NÃO** misture lógica de negócios ou chamadas assíncronas de rede diretamente dentro de funções `@Composable`.
 - Mantenha funções Composable limpas e desacopladas, utilizando parâmetros para eventos e lambdas (`onAction: () -> Unit`) para facilitar testes de UI.
 - Use nomes descritivos em português para textos de interface visível e inglês para código técnico, métodos e classes.
@@ -83,7 +84,95 @@ Com o `AGENTS.md` configurado na raiz do projeto, qualquer agente (como o Gemini
 
 ---
 
-## 🎨 3.2. Configuração do Tema e Tokens no Compose
+## 🔥 3.2. Configuração do Firebase e Firebase AI Logic (Instruções Estilo JetPacker)
+
+A forma recomendada e mais moderna pelo Google para integrar a **Gemini API** em aplicativos Android é através do **Firebase AI Logic** (`com.google.firebase:firebase-ai`), conforme demonstrado no repositório de referência oficial da equipe do Android: [android/ai-samples/jetpacker](https://github.com/android/ai-samples/tree/main/jetpacker).
+
+Diferente de chamadas HTTP diretas ou do antigo SDK com chaves de API expostas, o Firebase AI Logic oferece:
+* **Segurança Reforçada**: Elimina a necessidade de trafegar API keys expostas no código cliente por meio do **Firebase App Check** e atestação Play Integrity.
+* **Backend Otimizado**: Integração direta com `GenerativeBackend.googleAI()`.
+* **Aderência aos Modelos Mais Novos**: Suporte nativo ao modelo **`gemini-3.5-flash-lite`**, otimizado para baixíssima latência e respostas concisas em tempo real.
+
+Siga os 4 passos de configuração descritos a seguir:
+
+### 1. Criação do Projeto no Console do Firebase
+1. Acesse o [Firebase Console](https://console.firebase.google.com/) e faça login com sua conta Google.
+2. Crie um novo projeto (ex: `MindfulDays`) ou selecione um existente.
+3. Adicione um novo aplicativo Android informando o **Package Name** do projeto:
+   * **Package Name**: `dev.mindfuldays.app`
+4. Baixe o arquivo de configuração `google-services.json` gerado pelo Firebase.
+5. Salve o arquivo dentro do diretório `app/` do seu projeto (`MindfulDays/app/google-services.json`).
+
+> [!TIP]
+> **Arquivo Mock Placeholder para Compilação Local:**
+> Assim como no projeto de referência [JetPacker](https://github.com/android/ai-samples/tree/main/jetpacker), você pode manter um arquivo mock `app/google-services.json` inicial no projeto para que qualquer pessoa consiga compilar via Gradle imediatamente antes mesmo de cadastrar sua conta no console:
+> ```json
+> {
+>   "project_info": {
+>     "project_number": "123456",
+>     "project_id": "mock_mindfuldays",
+>     "storage_bucket": "mock_mindfuldays.firebasestorage.app"
+>   },
+>   "client": [
+>     {
+>       "client_info": {
+>         "mobilesdk_app_id": "1:123456:android:mock",
+>         "android_client_info": { "package_name": "dev.mindfuldays.app" }
+>       },
+>       "api_key": [{ "current_key": "123456-mock" }]
+>     }
+>   ],
+>   "configuration_version": "1"
+> }
+> ```
+
+### 2. Ativação da Gemini API no Console
+1. No menu lateral do Firebase Console, acesse **Build** → **AI Logic** (ou **Vertex AI in Firebase**).
+2. Clique no botão de ativação da Gemini API e conclua as instruções para habilitar a API no Google Cloud associado.
+
+### 3. Configuração do Gradle
+Adicione o plugin do Google Services e as dependências do Firebase AI Logic no seu projeto:
+
+No arquivo raiz `build.gradle.kts` (ou `gradle/libs.versions.toml`):
+```kotlin
+plugins {
+    // Plugin do Google Services
+    id("com.google.gms.google-services") version "4.4.2" apply false
+}
+```
+
+No arquivo `app/build.gradle.kts`:
+```kotlin
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
+    id("com.google.gms.google-services") // Aplica o plugin do Google Services
+}
+
+dependencies {
+    // Firebase BoM e Firebase AI Logic SDK
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation("com.google.firebase:firebase-ai")
+
+    // Firebase App Check para validação de segurança (Debug e Play Integrity)
+    implementation("com.google.firebase:firebase-appcheck-debug")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+}
+```
+
+### 4. Atestação de Segurança com Firebase App Check (Debug Token)
+Seguindo o guia do JetPacker, para testar a comunicação de IA em ambiente de desenvolvimento local (emulador ou aparelho físico):
+1. Execute o aplicativo no Android Studio.
+2. Abra a aba **Logcat** e filtre pelo termo `DebugAppCheckProvider`.
+3. Localize uma linha de log similar a:
+   ```text
+   Enter this debug secret into the allow list in the Firebase Console for your project: a8c2dd4c-7f7f-4764-b653-ef6c114ba27e
+   ```
+4. Copie o token secreto e registre-o no **Firebase Console** em **App Check** → **Apps** → **Manage Debug Tokens**.
+
+---
+
+## 🎨 3.3. Configuração do Tema e Tokens no Compose
 
 Crie o arquivo `dev/mindfuldays/app/ui/theme/Color.kt`:
 
@@ -130,7 +219,7 @@ fun MindfulDaysTheme(content: @Composable () -> Unit) {
 
 ---
 
-## 🧠 3.3. Modelo de Dados e Calculador das 9 Atitudes
+## 🧠 3.4. Modelo de Dados e Calculador das 9 Atitudes
 
 Crie a data class em `dev/mindfuldays/app/data/model/MindfulnessAttitude.kt`:
 
@@ -176,62 +265,110 @@ class AttitudeRepository {
 
 ---
 
-## 🤖 3.4. Integração com Gemini API para Reflexões Diárias
+## 🤖 3.5. Integração com Gemini API usando Firebase AI Logic (Padrão Museum Assistant com Gemini 3.5 flash-lite)
 
-Crie a interface de serviço em `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
+No projeto de referência [JetPacker (Museum Assistant)](https://github.com/android/ai-samples/tree/main/jetpacker), a integração com o Gemini é realizada através do **Firebase AI Logic** com o modelo **`gemini-3.5-flash-lite`** e `GenerativeBackend.googleAI()`.
+
+A grande vantagem dessa abordagem é a utilização de:
+1. `Firebase.ai(backend = GenerativeBackend.googleAI())`: Ponto de entrada nativo do SDK do Firebase AI.
+2. `modelName = "gemini-3.5-flash-lite"`: O modelo mais moderno, ultrarrápido e eficiente do Google para assistentes e reflexões em tempo real.
+3. `systemInstruction`: Delimita a personalidade do modelo (calmo, acolhedor, no máximo 2 frases, sem formatação complexa).
+4. `generateContent` ou `startChat()`: Permite gerar reflexões pontuais ou iniciar um diálogo interativo de mindfulness.
+
+Crie o arquivo em `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
 
 ```kotlin
 package dev.mindfuldays.app.data.remote
 
-import kotlinx.coroutines.dispatchers.Dispatchers
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.content
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
-import org.json.JSONObject
 
-class GeminiApiService(private val apiKey: String) {
+class GeminiApiService {
 
+    // Modelo generativo inicializado via Firebase AI Logic (idêntico ao Museum Assistant do JetPacker)
+    private val generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI())
+        .generativeModel(
+            modelName = "gemini-3.5-flash-lite",
+            systemInstruction = content {
+                text(
+                    "Você é um assistente calmo, sábio e acolhedor de mindfulness no aplicativo MindfulDays. " +
+                    "Seu propósito é gerar reflexões serenas para cultivar a atenção plena no dia a dia com base nas 9 atitudes de Jon Kabat-Zinn. " +
+                    "Responda sempre com no máximo 2 frases curtas, poéticas e inspiradoras. " +
+                    "Nunca use formatação complexa ou markdown, utilize texto simples e sereno."
+                )
+            }
+        )
+
+    /**
+     * Gera uma reflexão diária personalizada para a atitude informada.
+     */
     suspend fun generateReflection(attitudeTitle: String): String = withContext(Dispatchers.IO) {
-        if (apiKey.isBlank()) {
-            return@withContext "Configure sua GEMINI_API_KEY no arquivo local.properties para gerar reflexões personalizadas."
-        }
-
         try {
-            val url = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey")
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Content-Type", "application/json")
-            connection.doOutput = true
-
             val prompt = "Escreva uma reflexão inspiradora de 2 frases sobre a atitude de mindfulness: $attitudeTitle."
-            val jsonBody = JSONObject().apply {
-                put("contents", listOf(JSONObject().apply {
-                    put("parts", listOf(JSONObject().apply {
-                        put("text", prompt)
-                    }))
-                }))
-            }
-
-            connection.outputStream.use { os ->
-                os.write(jsonBody.toString().toByteArray())
-            }
-
-            if (connection.responseCode == 200) {
-                val responseText = connection.inputStream.bufferedReader().use { it.readText() }
-                val jsonResponse = JSONObject(responseText)
-                val text = jsonResponse
-                    .getJSONArray("candidates")
-                    .getJSONObject(0)
-                    .getJSONObject("content")
-                    .getJSONArray("parts")
-                    .getJSONObject(0)
-                    .getString("text")
-                text.trim()
-            } else {
-                "Não foi possível conectar ao Gemini. Tente novamente em instantes."
-            }
+            val response = generativeModel.generateContent(prompt)
+            response.text?.trim() ?: "Acolha o momento presente exatamente como ele se manifesta."
         } catch (e: Exception) {
-            "Conectado no modo offline. Pratique a reflexão: Concentre-se na sua respiração hoje."
+            if (e is CancellationException) throw e
+            // Fallback amigável para modo offline ou erro de comunicação
+            "Conectado no modo offline. Pratique a reflexão: Respire fundo e traga sua atenção para o momento presente."
+        }
+    }
+
+    /**
+     * Bônus: Suporte a Chat Interativo Multi-Turno (idêntico ao Chatbot do JetPacker).
+     */
+    fun startMindfulnessChat() = generativeModel.startChat()
+}
+```
+
+Agora, crie o ViewModel que conecta o repositório, o serviço do Gemini e o estado da UI em `dev/mindfuldays/app/ui/viewmodel/MindfulnessViewModel.kt`:
+
+```kotlin
+package dev.mindfuldays.app.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dev.mindfuldays.app.data.model.MindfulnessAttitude
+import dev.mindfuldays.app.data.remote.GeminiApiService
+import dev.mindfuldays.app.data.repository.AttitudeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class MindfulnessUiState(
+    val attitude: MindfulnessAttitude,
+    val aiReflection: String = "",
+    val isLoadingAi: Boolean = false
+)
+
+class MindfulnessViewModel(
+    private val repository: AttitudeRepository = AttitudeRepository(),
+    private val geminiService: GeminiApiService = GeminiApiService()
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        MindfulnessUiState(attitude = repository.getTodayAttitude())
+    )
+    val uiState: StateFlow<MindfulnessUiState> = _uiState.asStateFlow()
+
+    fun generateAiReflection() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingAi = true) }
+            val attitudeTitle = _uiState.value.attitude.title
+            val reflection = geminiService.generateReflection(attitudeTitle)
+            _uiState.update {
+                it.copy(
+                    aiReflection = reflection,
+                    isLoadingAi = false
+                )
+            }
         }
     }
 }
@@ -239,7 +376,7 @@ class GeminiApiService(private val apiKey: String) {
 
 ---
 
-## 📱 3.5. Implementando a Home Screen em Jetpack Compose
+## 📱 3.6. Implementando a Home Screen em Jetpack Compose
 
 Crie o arquivo em `dev/mindfuldays/app/ui/home/HomeScreen.kt`:
 
