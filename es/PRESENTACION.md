@@ -41,9 +41,9 @@ Guía completa y traducida al español de todas las diapositivas de la presentac
   * **ETAPA 03 — Código:**
     * • Código declarativo (Compose)
     * • Lógica y atención plena
-  * **ETAPA 04 — CI/CD:**
-    * • Pruebas automatizadas
-    * • Integración y entrega continua con IA
+  * **ETAPA 04 — Calidad:**
+    * • Pruebas automatizadas con IA
+    * • Robot Pattern en Jetpack Compose
 * **Pie de página:** *Taller MindfulDays // Android*
 
 ---
@@ -69,7 +69,7 @@ Guía completa y traducida al español de todas las diapositivas de la presentac
   * **01 — Etapa 1: Stitch (Design Tokens):** Prototipado ágil y extracción de Design Tokens.
   * **02 — Etapa 2: Studio (Android Studio):** Importación de pantallas con el asistente 'Create with AI' usando prompts multimodales.
   * **03 — Etapa 3: Compose (Jetpack Compose):** Construcción de la UI declarativa e integración de la lógica de negocio.
-  * **04 — Etapa 4: Actions (GitHub Actions):** Pruebas automatizadas y pipeline de integración continua.
+  * **04 — Etapa 4: Robot Pattern (Calidad y Pruebas):** Pruebas unitarias, de UI y Robot Pattern asistidos por IA.
 * **Pie de página:** *Taller MindfulDays // Android*
 
 ---
@@ -109,14 +109,12 @@ Guía completa y traducida al español de todas las diapositivas de la presentac
 * **Pilares:**
   * **Jetpack Compose:** Interfaz moderna implementada de forma declarativa y reactiva.
   * **Lógica de Negocio:** Ciclo de 9 días para alternar las actitudes en base a la fecha del sistema.
-  * **Integración Gemini API:** Modelo `gemini-1.5-flash` para la generación de frases inspiradoras y reflexiones personalizadas en tiempo real.
+  * **Integración Gemini API:** Modelo `gemini-3.8-flash` para la generación de frases inspiradoras y reflexiones personalizadas en tiempo real.
 * **Código de Ejemplo:**
   ```kotlin
-  // Integración en Android Studio IDE
-  val geminiFlash = GenerativeModel(
-    modelName = "gemini-1.5-flash",
-    apiKey = BuildConfig.apiKey
-  )
+  // Integración segura vía Retrofit y BuildConfig
+  val apiKey = BuildConfig.GEMINI_API_KEY
+  val response = api.generateContent(apiKey = apiKey, request = request)
   ```
 * **Pie de página:** *Taller MindfulDays // Android*
 

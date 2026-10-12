@@ -25,6 +25,7 @@ IMPORTANT DESIGN SYSTEM CONSTRAINTS (STRICT):
 - Components: Use ONLY standard native Android Material 3 components (TopAppBar, ElevatedCard, Button, OutlinedButton, IconButton, Switch, OutlinedTextField, HorizontalDivider). DO NOT create custom complex components, custom pills, audio waveforms, habit streaks, or charts.
 - Typography: Use standard Android system default typography (Roboto / system sans-serif). DO NOT use custom, serif, or imported fonts (no Newsreader, no Plus Jakarta Sans).
 - Layout: Pure single-column layout with generous whitespace. Keep screens extremely simple and didactic for a live-coding workshop.
+- Internationalization Readiness: All UI text elements, titles, and button labels must be concise and semantic, designed to map cleanly into Android string resources (English default, Spanish, Portuguese).
 - Color Palette:
   * Primary: Soft sage green (#6B8E23)
   * Secondary / Dividers: Sand / Muted beige (#E8DFD8)

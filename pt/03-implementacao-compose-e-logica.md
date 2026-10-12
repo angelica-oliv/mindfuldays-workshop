@@ -61,11 +61,10 @@ Respeite estritamente a paleta de cores definida nos protótipos do Google Stitc
 ## 🧠 Regras de Negócio Fundamentais
 1. **Regra das 9 Atitudes**: A lista contém exatamente 9 atitudes fixas. O cálculo da atitude diária deve usar o dia do ano:
    `val index = (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) - 1) % 9`
-2. **Gemini API com Firebase AI Logic**:
-   - Utilizar a biblioteca oficial `com.google.firebase:firebase-ai` com o backend `GenerativeBackend.googleAI()`.
-   - Utilizar o modelo mais recente: `gemini-3.5-flash-lite`.
+2. **Gemini API (Reflexões Diárias)**:
+   - Utilizar o endpoint do modelo `gemini-3.8-flash:generateContent`.
    - Gerar reflexões concisas e inspiradoras com no máximo 2 frases para cada atitude.
-   - Tratar ausência de conexão e exceções com fallback amigável offline sem quebrar o app.
+   - Tratar ausência de chave de API e erros de rede com fallback amigável offline sem quebrar o app.
 
 ## 🛠️ Comandos de Verificação e Validação
 Sempre verifique as alterações utilizando os seguintes comandos no terminal:
@@ -74,7 +73,7 @@ Sempre verifique as alterações utilizando os seguintes comandos no terminal:
 - **Linter & Análise Estática**: `./gradlew lintDebug`
 
 ## 🚫 Restrições Rígidas (Guardrails)
-- **NUNCA** faça hardcode de credenciais ou chaves de API (`apiKey`) no código. A autenticação é gerenciada com segurança pelo Firebase via `google-services.json` e Firebase App Check.
+- **NUNCA** faça hardcode de credenciais ou chaves de API (`apiKey`) no código versionado. A chave deve ser configurada em `local.properties` e consumida via `BuildConfig.GEMINI_API_KEY`.
 - **NÃO** misture lógica de negócios ou chamadas assíncronas de rede diretamente dentro de funções `@Composable`.
 - Mantenha funções Composable limpas e desacopladas, utilizando parâmetros para eventos e lambdas (`onAction: () -> Unit`) para facilitar testes de UI.
 - Use nomes descritivos em português para textos de interface visível e inglês para código técnico, métodos e classes.
@@ -84,204 +83,340 @@ Com o `AGENTS.md` configurado na raiz do projeto, qualquer agente (como o Gemini
 
 ---
 
-## 🔥 3.2. Configuração do Firebase e Firebase AI Logic (Instruções Estilo JetPacker)
+## 🔑 3.2. Configuração da Gemini API e Gerenciamento Seguro de Credenciais
 
-A forma recomendada e mais moderna pelo Google para integrar a **Gemini API** em aplicativos Android é através do **Firebase AI Logic** (`com.google.firebase:firebase-ai`), conforme demonstrado no repositório de referência oficial da equipe do Android: [android/ai-samples/jetpacker](https://github.com/android/ai-samples/tree/main/jetpacker).
+Para integrar a **Gemini API** ao aplicativo de forma robusta, moderna e direta, utilizamos chamadas REST com **Retrofit**, **Moshi** e **OkHttp** conectando ao endpoint oficial do modelo **`gemini-3.8-flash`**.
 
-Diferente de chamadas HTTP diretas ou do antigo SDK com chaves de API expostas, o Firebase AI Logic oferece:
-* **Segurança Reforçada**: Elimina a necessidade de trafegar API keys expostas no código cliente por meio do **Firebase App Check** e atestação Play Integrity.
-* **Backend Otimizado**: Integração direta com `GenerativeBackend.googleAI()`.
-* **Aderência aos Modelos Mais Novos**: Suporte nativo ao modelo **`gemini-3.5-flash-lite`**, otimizado para baixíssima latência e respostas concisas em tempo real.
+Abaixo estão os passos essenciais e boas práticas para evitar erros comuns de permissão, ativação e segurança:
 
-Siga os 4 passos de configuração descritos a seguir:
+### 1. Obtenção da API Key no Google AI Studio
+1. Acesse o [Google AI Studio](https://aistudio.google.com/) e faça login com sua conta Google.
+2. Clique em **Get API key** (Obter chave de API) e crie uma nova chave em um projeto novo ou existente.
+3. Copie a chave gerada.
 
-### 1. Criação do Projeto no Console do Firebase
-1. Acesse o [Firebase Console](https://console.firebase.google.com/) e faça login com sua conta Google.
-2. Crie um novo projeto (ex: `MindfulDays`) ou selecione um existente.
-3. Adicione um novo aplicativo Android informando o **Package Name** do projeto:
-   * **Package Name**: `dev.mindfuldays.app`
-4. Baixe o arquivo de configuração `google-services.json` gerado pelo Firebase.
-5. Salve o arquivo dentro do diretório `app/` do seu projeto (`MindfulDays/app/google-services.json`).
+> [!WARNING]
+> **Armadilha Comum — Chaves do Firebase (`API_KEY_SERVICE_BLOCKED` 403):**
+> Nunca utilize chaves de API geradas automaticamente pelo Firebase com restrições para apps Android para chamar o endpoint da Gemini API. Essas chaves possuem restrições de escopo e geram o erro:
+> `403 PERMISSION_DENIED: Requests to this API generativelanguage.googleapis.com method ... are blocked (API_KEY_SERVICE_BLOCKED)`.
+> Utilize sempre uma chave gerada diretamente no **Google AI Studio** ou no Google Cloud com a API habilitada.
 
-> [!TIP]
-> **Arquivo Mock Placeholder para Compilação Local:**
-> Assim como no projeto de referência [JetPacker](https://github.com/android/ai-samples/tree/main/jetpacker), você pode manter um arquivo mock `app/google-services.json` inicial no projeto para que qualquer pessoa consiga compilar via Gradle imediatamente antes mesmo de cadastrar sua conta no console:
-> ```json
-> {
->   "project_info": {
->     "project_number": "123456",
->     "project_id": "mock_mindfuldays",
->     "storage_bucket": "mock_mindfuldays.firebasestorage.app"
->   },
->   "client": [
->     {
->       "client_info": {
->         "mobilesdk_app_id": "1:123456:android:mock",
->         "android_client_info": { "package_name": "dev.mindfuldays.app" }
->       },
->       "api_key": [{ "current_key": "123456-mock" }]
->     }
->   ],
->   "configuration_version": "1"
-> }
-> ```
+### 2. Ativação da Generative Language API no Google Cloud
+Mesmo com uma chave válida gerada, se o projeto do Google Cloud associado à sua chave ainda não tiver a API habilitada, as chamadas serão recusadas com o erro:
+`403 FORBIDDEN: Generative Language API has not been used in project ... or it is disabled (SERVICE_DISABLED)`.
 
-### 2. Ativação da Gemini API no Console
-1. No menu lateral do Firebase Console, acesse **Build** → **AI Logic** (ou **Vertex AI in Firebase**).
-2. Clique no botão de ativação da Gemini API e conclua as instruções para habilitar a API no Google Cloud associado.
+Para ativar:
+1. Acesse o console do Google Cloud no link fornecido pelo próprio erro ou em:
+   `https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=<SEU_PROJECT_ID>`
+2. Clique no botão **Ativar** (Enable). A ativação leva apenas alguns segundos para propagar.
 
-### 3. Configuração do Gradle
-Adicione o plugin do Google Services e as dependências do Firebase AI Logic no seu projeto:
+### 3. Armazenamento Seguro no `local.properties` (Guardrail de Segurança)
+Seguindo as diretrizes de segurança do projeto (`AGENTS.md`), **NUNCA faça commit de chaves de API no Git** nem insira a chave hardcoded no código Kotlin.
 
-No arquivo raiz `build.gradle.kts` (ou `gradle/libs.versions.toml`):
+Abra o arquivo `local.properties` na raiz do projeto (que já é ignorado pelo `.gitignore`) e adicione:
+
+```properties
+GEMINI_API_KEY=sua_chave_do_ai_studio_aqui
+```
+
+### 4. Injeção da Chave via `buildConfigField` no `app/build.gradle.kts`
+Para que o código Kotlin tenha acesso seguro à chave durante a compilação, configuramos o Gradle para carregar o `local.properties` e gerar a constante em `BuildConfig`.
+
+No arquivo `app/build.gradle.kts`:
+
 ```kotlin
-plugins {
-    // Plugin do Google Services
-    id("com.google.gms.google-services") version "4.5.0" apply false
+import java.util.Properties
+
+// Carrega as variáveis do local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
+val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY") ?: ""
+
+android {
+    ...
+    defaultConfig {
+        ...
+        // Injeta a chave de forma segura no BuildConfig
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true // Habilita a geração da classe BuildConfig
+    }
+}
+```
+
+### 5. Dependências do Gradle (Retrofit, Moshi e OkHttp)
+Para realizar a comunicação HTTP assíncrona e a serialização JSON de forma performática, adicione as dependências no seu projeto:
+
+No arquivo `gradle/libs.versions.toml`:
+```toml
+[versions]
+retrofit = "3.0.0"
+converterMoshi = "3.0.0"
+okhttp = "5.3.2"
+loggingInterceptor = "5.3.2"
+moshiKotlin = "1.15.2"
+moshiKotlinCodegen = "1.15.2"
+
+[libraries]
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "converterMoshi" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
+moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiKotlin" }
+moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
 ```
 
 No arquivo `app/build.gradle.kts`:
 ```kotlin
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.compose.compiler)
-    id("com.google.gms.google-services") // Aplica o plugin do Google Services
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 dependencies {
-    // Firebase BoM e Firebase AI Logic SDK
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-    implementation("com.google.firebase:firebase-ai")
-
-    // Firebase App Check para validação de segurança (Debug e Play Integrity)
-    implementation("com.google.firebase:firebase-appcheck-debug")
-    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    // Networking e Gemini API
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    "ksp"(libs.moshi.kotlin.codegen)
 }
 ```
-
-### 4. Atestação de Segurança com Firebase App Check (Código e Debug Token)
-
-#### 🛡️ Por que estamos fazendo isso?
-1. **Proteção da IA e Recursos em Nuvem:** Chamadas à API Gemini (via Firebase AI Logic / Vertex AI in Firebase) e serviços de nuvem envolvem cotas e cobrança. O **Firebase App Check** adiciona uma camada essencial de proteção, garantindo que **apenas instâncias legítimas do seu aplicativo**, instaladas em dispositivos autênticos e não modificados, consigam consumir a API de IA. Ele bloqueia bots, ataques de negação de serviço (DoS), clonagem de requisições e acessos de terceiros que tentem usar sua cota de IA.
-2. **Por que precisamos do Debug Token em desenvolvimento local?**
-   - Em produção, o App Check utiliza o **Google Play Integrity** para validar automaticamente a assinatura do app e a integridade do dispositivo Android via Google Play Store.
-   - Em desenvolvimento local (no Android Studio, via emulador ou cabo USB), o aplicativo ainda não foi assinado com as chaves de produção da Play Store nem distribuído pela loja. Logo, o Play Integrity não consegue atestar o ambiente de desenvolvimento.
-   - O **Debug Provider** (`DebugAppCheckProviderFactory`) resolve isso: ele gera um token único (UUID) no Logcat do seu ambiente local. Quando você registra esse token no Firebase Console, o Firebase autoriza especificamente a sua máquina ou emulador a realizar chamadas de IA sem desabilitar a proteção para o restante do mundo.
-
-> [!IMPORTANT]
-> **Por que o Logcat não exibe o token automaticamente?**
-> O Firebase App Check **não é ativado apenas adicionando a dependência no Gradle**. É indispensável inicializar o Firebase e instalar a fábrica do provedor de debug (`DebugAppCheckProviderFactory`) no código Kotlin do seu aplicativo. Sem isso, a fábrica de debug nunca é executada e nenhuma mensagem é emitida no Logcat.
-
-Crie o arquivo `dev/mindfuldays/app/MindfulDaysApplication.kt` (idêntico ao [JetPackerApplication](https://github.com/android/ai-samples/blob/main/jetpacker/android/app/src/main/kotlin/com/example/jetpacker/JetPackerApplication.kt) do repositório oficial da Google):
-
-```kotlin
-package dev.mindfuldays.app
-
-import android.app.Application
-import com.google.firebase.Firebase
-import com.google.firebase.appcheck.appCheck
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
-import com.google.firebase.initialize
-
-class MindfulDaysApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-        
-        // 1. Inicializa o Firebase com o contexto da aplicação
-        Firebase.initialize(context = this)
-
-        // 2. Instala a fábrica de provedor de debug (gera o token no Logcat)
-        Firebase.appCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance()
-        )
-    }
-}
-```
-
-Em seguida, registre sua classe Application no `app/src/main/AndroidManifest.xml`:
-
-```xml
-<application
-    android:name=".MindfulDaysApplication"
-    android:label="@string/app_name"
-    android:icon="@mipmap/ic_launcher"
-    ... >
-```
-
-> [!TIP]
-> **Alternativa Rápida (Diretamente na MainActivity):**
-> Se preferir não criar uma classe Application separada, você também pode adicionar essas duas linhas diretamente no início do método `onCreate()` da sua `MainActivity.kt`:
-> ```kotlin
-> override fun onCreate(savedInstanceState: Bundle?) {
->     super.onCreate(savedInstanceState)
->     Firebase.initialize(context = this)
->     Firebase.appCheck.installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance())
->     ...
-> }
-> ```
-
-#### 📋 Passo a Passo para Obter e Registrar o Debug Token no Firebase Console:
-
-1. **Obter o Token no Android Studio:**
-   - Execute o aplicativo no Android Studio (em um emulador ou aparelho físico).
-   - Abra a aba **Logcat** e filtre pelo termo `DebugAppCheckProvider`.
-   - Você verá no console a mensagem com o token de debug gerado:
-     ```text
-     D/DebugAppCheckProvider: Enter this debug secret into the allow list in the Firebase Console for your project: a8c2dd4c-7f7f-4764-b653-ef6c114ba27e
-     ```
-   - Copie o código UUID exibido (ex: `a8c2dd4c-7f7f-4764-b653-ef6c114ba27e`).
-
-2. **Cadastrar no Firebase Console:**
-   - Acesse o [Firebase Console](https://console.firebase.google.com/) e selecione o seu projeto.
-   - No menu lateral esquerdo, navegue até **App Check** (na seção *Build* ou *Segurança*).
-   - Clique na aba **Apps** (Aplicativos).
-   - Localize a linha correspondente ao seu app Android (`dev.mindfuldays.app`).
-   - **Não clique em configurar provedores na tabela!** Em vez disso, clique no **menu de 3 pontinhos verticais (`⋮`)** na extremidade direita da linha do app.
-   - Selecione a opção **Manage debug tokens** (*Gerenciar tokens de depuração*).
-   - Clique em **Add debug token** (*Adicionar token de depuração*).
-   - Defina um nome identificador (ex: `Meu Emulador Local`) e cole o UUID copiado do Logcat.
-   - Clique em **Save** (*Salvar*).
-
-> [!CAUTION]
-> **Cuidado com Provedores Incorretos:**
-> - **Não selecione Fraud Defense (formerly known as reCAPTCHA Enterprise):** Esta opção é voltada exclusivamente para aplicações **Web**.
-> - Em desenvolvimento local, não configure o Play Integrity ainda; utilize apenas o **Debug Token** pelo menu de 3 pontinhos (`⋮`).
-> - Em produção na Play Store, o provedor correto para Android será o **Play Integrity**.
 
 ---
 
-## 🧠 3.3. Repositório e Calculador das 9 Atitudes
+## 🌐 3.3. Internacionalização (i18n): Suporte Multi-idioma (Inglês, Português e Espanhol)
 
-> [!NOTE]
-> A data class `MindfulnessAttitude` já foi definida na estrutura inicial do projeto em `dev/mindfuldays/app/data/model/MindfulnessAttitude.kt`.
+Uma das melhores práticas essenciais de desenvolvimento Android é nunca deixar textos visíveis hardcoded em código Kotlin ou Composables. Além de facilitar testes e manutenção, isso permite que o aplicativo se adapte instantaneamente ao idioma configurado no dispositivo do usuário.
 
-Agora, implemente a classe de repositório em `dev/mindfuldays/app/data/repository/AttitudeRepository.kt`:
+No Android, os recursos de texto residem dentro de `app/src/main/res/values`:
+- `values/strings.xml`: Tabela padrão (fallback internacional em Inglês).
+- `values-pt/strings.xml`: Tabela específica para Português.
+- `values-es/strings.xml`: Tabela específica para Espanhol.
+
+### 1. `app/src/main/res/values/strings.xml` (Padrão / Inglês)
+```xml
+<resources>
+    <string name="app_name">MindfulDays</string>
+    <string name="app_title">MINDFULDAYS</string>
+    <string name="attitude_counter">Attitude %1$d of %2$d</string>
+
+    <!-- Home Screen -->
+    <string name="default_reflection">“Take a deep breath and bring your awareness to the present moment.”</string>
+    <string name="btn_new_reflection">✨ New Reflection (Gemini AI)</string>
+    <string name="btn_start_timer">⏱️ Start Meditation Timer</string>
+
+    <!-- Timer Screen -->
+    <string name="timer_title">Meditation Timer</string>
+    <string name="timer_subtitle">Focus on your breath</string>
+    <string name="timer_session_guided">• GUIDED SESSION</string>
+    <string name="timer_status_completed">Completed</string>
+    <string name="timer_status_running">In progress</string>
+    <string name="timer_status_paused">Paused</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_reminders">Daily Reminders</string>
+    <string name="settings_daily_reminder">Daily Attitude Reminder</string>
+    <string name="settings_meditate_reminder">Meditation Reminder</string>
+    <string name="settings_section_about">About the App</string>
+    <string name="settings_version_info">Version 1.0 • 9 Jon Kabat-Zinn Attitudes</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_settings">Settings</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_reset">Reset</string>
+    <string name="cd_play">Start</string>
+    <string name="cd_pause">Pause</string>
+
+    <!-- The 9 Attitudes -->
+    <string name="attitude_1_name">Beginner\'s Mind</string>
+    <string name="attitude_1_desc">Look at things as if for the first time, free from expectations.</string>
+    <string name="attitude_2_name">Non-Judging</string>
+    <string name="attitude_2_desc">Observe your thoughts and feelings without labeling them good or bad.</string>
+    <string name="attitude_3_name">Acceptance</string>
+    <string name="attitude_3_desc">Acknowledge and embrace the present moment exactly as it is.</string>
+    <string name="attitude_4_name">Letting Go</string>
+    <string name="attitude_4_desc">Release thoughts and desires that attempt to capture your attention.</string>
+    <string name="attitude_5_name">Trust</string>
+    <string name="attitude_5_desc">Develop a basic belief in yourself and in your body\'s signals.</string>
+    <string name="attitude_6_name">Non-Striving</string>
+    <string name="attitude_6_desc">Abandon the constant need to achieve an immediate result.</string>
+    <string name="attitude_7_name">Patience</string>
+    <string name="attitude_7_desc">Understand that certain things need time to develop naturally.</string>
+    <string name="attitude_8_name">Gratitude</string>
+    <string name="attitude_8_desc">Appreciate the present moment and value what you already have.</string>
+    <string name="attitude_9_name">Generosity</string>
+    <string name="attitude_9_desc">Offer attention, warmth, and presence with an open heart.</string>
+</resources>
+```
+
+### 2. `app/src/main/res/values-pt/strings.xml` (Português)
+```xml
+<resources>
+    <string name="app_name">MindfulDays</string>
+    <string name="app_title">MINDFULDAYS</string>
+    <string name="attitude_counter">Atitude %1$d de %2$d</string>
+
+    <!-- Home Screen -->
+    <string name="default_reflection">“Respire fundo e traga sua atenção para o momento presente.”</string>
+    <string name="btn_new_reflection">✨ Nova Reflexão (Gemini IA)</string>
+    <string name="btn_start_timer">⏱️ Iniciar Timer de Meditação</string>
+
+    <!-- Timer Screen -->
+    <string name="timer_title">Timer de Meditação</string>
+    <string name="timer_subtitle">Concentre-se na respiração</string>
+    <string name="timer_session_guided">• SESSÃO GUIADA</string>
+    <string name="timer_status_completed">Concluído</string>
+    <string name="timer_status_running">Em andamento</string>
+    <string name="timer_status_paused">Pausado</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Configurações</string>
+    <string name="settings_section_reminders">Lembretes Diários</string>
+    <string name="settings_daily_reminder">Lembrete da Atitude Diária</string>
+    <string name="settings_meditate_reminder">Lembrete para Meditar</string>
+    <string name="settings_section_about">Sobre o App</string>
+    <string name="settings_version_info">Versão 1.0 • 9 Atitudes de Jon Kabat-Zinn</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_settings">Configurações</string>
+    <string name="cd_back">Voltar</string>
+    <string name="cd_reset">Reiniciar</string>
+    <string name="cd_play">Iniciar</string>
+    <string name="cd_pause">Pausar</string>
+
+    <!-- The 9 Attitudes -->
+    <string name="attitude_1_name">Mente de Principiante</string>
+    <string name="attitude_1_desc">Olhe para as coisas como se fosse a primeira vez, livre de expectativas.</string>
+    <string name="attitude_2_name">Não-Julgamento</string>
+    <string name="attitude_2_desc">Observe seus pensamentos e sentimentos sem rotulá-los como bons ou ruins.</string>
+    <string name="attitude_3_name">Aceitação</string>
+    <string name="attitude_3_desc">Reconheça e acolha o momento presente exatamente como ele é.</string>
+    <string name="attitude_4_name">Desapego</string>
+    <string name="attitude_4_desc">Deixe ir pensamentos e desejos que tentam prender sua atenção.</string>
+    <string name="attitude_5_name">Confiança</string>
+    <string name="attitude_5_desc">Desenvolva uma crença básica em si mesmo e nos seus sinais corporais.</string>
+    <string name="attitude_6_name">Não-Esforço</string>
+    <string name="attitude_6_desc">Abandone a necessidade constante de alcançar um resultado imediato.</string>
+    <string name="attitude_7_name">Paciência</string>
+    <string name="attitude_7_desc">Compreenda que certas coisas precisam de tempo para se desenvolver.</string>
+    <string name="attitude_8_name">Gratidão</string>
+    <string name="attitude_8_desc">Aprecie o momento presente e valorize o que você já possui.</string>
+    <string name="attitude_9_name">Generosidade</string>
+    <string name="attitude_9_desc">Ofereça atenção, carinho e presença com o coração aberto.</string>
+</resources>
+```
+
+### 3. `app/src/main/res/values-es/strings.xml` (Espanhol)
+```xml
+<resources>
+    <string name="app_name">MindfulDays</string>
+    <string name="app_title">MINDFULDAYS</string>
+    <string name="attitude_counter">Actitud %1$d de %2$d</string>
+
+    <!-- Home Screen -->
+    <string name="default_reflection">“Respira profundo y trae tu atención al momento presente.”</string>
+    <string name="btn_new_reflection">✨ Nueva Reflexión (Gemini IA)</string>
+    <string name="btn_start_timer">⏱️ Iniciar Temporizador de Meditación</string>
+
+    <!-- Timer Screen -->
+    <string name="timer_title">Temporizador de Meditación</string>
+    <string name="timer_subtitle">Concéntrate en la respiración</string>
+    <string name="timer_session_guided">• SESIÓN GUIADA</string>
+    <string name="timer_status_completed">Completado</string>
+    <string name="timer_status_running">En curso</string>
+    <string name="timer_status_paused">Pausado</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_section_reminders">Recordatorios Diarios</string>
+    <string name="settings_daily_reminder">Recordatorio de Actitud Diaria</string>
+    <string name="settings_meditate_reminder">Recordatorio para Meditar</string>
+    <string name="settings_section_about">Acerca de la App</string>
+    <string name="settings_version_info">Versión 1.0 • 9 Actitudes de Jon Kabat-Zinn</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_settings">Configuración</string>
+    <string name="cd_back">Volver</string>
+    <string name="cd_reset">Reiniciar</string>
+    <string name="cd_play">Iniciar</string>
+    <string name="cd_pause">Pausar</string>
+
+    <!-- The 9 Attitudes -->
+    <string name="attitude_1_name">Mente de Principiante</string>
+    <string name="attitude_1_desc">Mira las cosas como si fuera la primera vez, libre de expectativas.</string>
+    <string name="attitude_2_name">No Juicio</string>
+    <string name="attitude_2_desc">Observa tus pensamientos y sentimientos sin etiquetarlos como buenos o malos.</string>
+    <string name="attitude_3_name">Aceptación</string>
+    <string name="attitude_3_desc">Reconoce y acoge el momento presente exactamente como es.</string>
+    <string name="attitude_4_name">Desapego</string>
+    <string name="attitude_4_desc">Deja ir los pensamientos y deseos que intentan atrapar tu atención.</string>
+    <string name="attitude_5_name">Confianza</string>
+    <string name="attitude_5_desc">Desarrolla una creencia básica en ti mismo y en las señales de tu cuerpo.</string>
+    <string name="attitude_6_name">No Esforzarse</string>
+    <string name="attitude_6_desc">Abandona la necesidad constante de alcanzar un resultado inmediato.</string>
+    <string name="attitude_7_name">Paciencia</string>
+    <string name="attitude_7_desc">Comprende que ciertas cosas necesitan tiempo para desarrollarse.</string>
+    <string name="attitude_8_name">Gratitud</string>
+    <string name="attitude_8_desc">Aprecia el momento presente y valora lo que ya posees.</string>
+    <string name="attitude_9_name">Generosidad</string>
+    <string name="attitude_9_desc">Ofrece atención, cariño y presencia con el corazón abierto.</string>
+</resources>
+```
+
+---
+
+## 🧠 3.4. Repositório e Modelo das 9 Atitudes com Internacionalização
+
+A data class `MindfulnessAttitude` em `dev/mindfuldays/app/data/model/MindfulnessAttitude.kt` encapsula os atributos essenciais de cada atitude, incluindo anotações `@StringRes` para referenciar os recursos de strings:
+
+```kotlin
+package dev.mindfuldays.app.data.model
+
+import androidx.annotation.StringRes
+
+data class MindfulnessAttitude(
+    val id: Int,
+    val name: String = "",
+    val description: String = "",
+    @get:StringRes val nameRes: Int = 0,
+    @get:StringRes val descriptionRes: Int = 0
+)
+```
+
+Agora, implemente a classe de repositório em `dev/mindfuldays/app/data/repository/AttitudeRepository.kt` mapeando cada atitude para seu respectivo recurso de texto:
 
 ```kotlin
 package dev.mindfuldays.app.data.repository
 
+import dev.mindfuldays.app.R
 import dev.mindfuldays.app.data.model.MindfulnessAttitude
 import java.util.Calendar
 
 class AttitudeRepository {
 
     val attitudes = listOf(
-        MindfulnessAttitude(1, "Mente de Principiante", "Olhe para as coisas como se fosse a primeira vez, livre de expectativas."),
-        MindfulnessAttitude(2, "Não-Julgamento", "Observe seus pensamentos e sentimentos sem rotulá-los como bons ou ruins."),
-        MindfulnessAttitude(3, "Aceitação", "Reconheça e acolha o momento presente exatamente como ele é."),
-        MindfulnessAttitude(4, "Desapego", "Deixe ir pensamentos e desejos que tentam prender sua atenção."),
-        MindfulnessAttitude(5, "Confiança", "Desenvolva uma crença básica em si mesmo e nos seus sinais corporais."),
-        MindfulnessAttitude(6, "Não-Esforço", "Abandone a necessidade constante de alcançar um resultado imediato."),
-        MindfulnessAttitude(7, "Paciência", "Compreenda que certas coisas precisam de tempo para se desenvolver."),
-        MindfulnessAttitude(8, "Gratidão", "Aprecie o momento presente e valorize o que você já possui."),
-        MindfulnessAttitude(9, "Generosidade", "Ofereça atenção, carinho e presença com o coração aberto.")
+        MindfulnessAttitude(1, "Mente de Principiante", "Olhe para as coisas como se fosse a primeira vez, livre de expectativas.", R.string.attitude_1_name, R.string.attitude_1_desc),
+        MindfulnessAttitude(2, "Não-Julgamento", "Observe seus pensamentos e sentimentos sem rotulá-los como bons ou ruins.", R.string.attitude_2_name, R.string.attitude_2_desc),
+        MindfulnessAttitude(3, "Aceitação", "Reconheça e acolha o momento presente exatamente como ele é.", R.string.attitude_3_name, R.string.attitude_3_desc),
+        MindfulnessAttitude(4, "Desapego", "Deixe ir pensamentos e desejos que tentam prender sua atenção.", R.string.attitude_4_name, R.string.attitude_4_desc),
+        MindfulnessAttitude(5, "Confiança", "Desenvolva uma crença básica em si mesmo e nos seus sinais corporais.", R.string.attitude_5_name, R.string.attitude_5_desc),
+        MindfulnessAttitude(6, "Não-Esforço", "Abandone a necessidade constante de alcançar um resultado imediato.", R.string.attitude_6_name, R.string.attitude_6_desc),
+        MindfulnessAttitude(7, "Paciência", "Compreenda que certas coisas precisam de tempo para se desenvolver.", R.string.attitude_7_name, R.string.attitude_7_desc),
+        MindfulnessAttitude(8, "Gratidão", "Aprecie o momento presente e valorize o que você já possui.", R.string.attitude_8_name, R.string.attitude_8_desc),
+        MindfulnessAttitude(9, "Generosidade", "Ofereça atenção, carinho e presença com o coração aberto.", R.string.attitude_9_name, R.string.attitude_9_desc)
     )
 
-    fun getTodayAttitude(): MindfulnessAttitude {
-        val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
-        val index = (dayOfYear - 1) % attitudes.size
+    fun getTodayAttitude(dayOfYear: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)): MindfulnessAttitude {
+        val index = (dayOfYear - 1).mod(attitudes.size)
         return attitudes[index]
     }
 }
@@ -289,64 +424,164 @@ class AttitudeRepository {
 
 ---
 
-## 🤖 3.4. Integração com Gemini API usando Firebase AI Logic (Padrão Museum Assistant com Gemini 3.5 flash-lite)
+## 🤖 3.4. Integração com Gemini API via Retrofit e Moshi (`GeminiApiService.kt`)
 
-No projeto de referência [JetPacker (Museum Assistant)](https://github.com/android/ai-samples/tree/main/jetpacker), a integração com o Gemini é realizada através do **Firebase AI Logic** com o modelo **`gemini-3.5-flash-lite`** e `GenerativeBackend.googleAI()`.
+Agora vamos implementar o serviço de rede e o ViewModel para conectar a interface com a **Gemini API**.
 
-A grande vantagem dessa abordagem é a utilização de:
-1. `Firebase.ai(backend = GenerativeBackend.googleAI())`: Ponto de entrada nativo do SDK do Firebase AI.
-2. `modelName = "gemini-3.5-flash-lite"`: O modelo mais moderno, ultrarrápido e eficiente do Google para assistentes e reflexões em tempo real.
-3. `systemInstruction`: Delimita a personalidade do modelo (calmo, acolhedor, no máximo 2 frases, sem formatação complexa).
-4. `generateContent` ou `startChat()`: Permite gerar reflexões pontuais ou iniciar um diálogo interativo de mindfulness.
+> [!IMPORTANT]
+> **Atenção ao Modelo (`gemini-3.8-flash`):**
+> Modelos anteriores como `gemini-1.5-flash` ou `gemini-2.5-flash` foram descontinuados para novas chaves no endpoint `v1beta`, retornando erro HTTP 404 (`"This model is no longer available to new users"`).
+> O modelo atualizado e recomendado para respostas ágeis de texto é o **`gemini-3.8-flash`**.
+>
+> **Atenção à Serialização com Moshi em Kotlin:**
+> Ao utilizar Moshi no Android, anote todas as classes de transferência de dados com `@JsonClass(generateAdapter = true)` e configure `KotlinJsonAdapterFactory()` no builder do Moshi. Sem isso, o Moshi tentará utilizar reflexão padrão do Java, gerando uma exceção de serialização silenciosa em tempo de execução.
 
 Crie o arquivo em `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
 
 ```kotlin
 package dev.mindfuldays.app.data.remote
 
-import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
-import com.google.firebase.ai.type.content
+import dev.mindfuldays.app.BuildConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Query
+
+// Data Transfer Objects (DTOs) com adapters gerados pelo Moshi
+@JsonClass(generateAdapter = true)
+data class GeminiRequest(val contents: List<Content>)
+
+@JsonClass(generateAdapter = true)
+data class Content(val parts: List<Part>)
+
+@JsonClass(generateAdapter = true)
+data class Part(val text: String)
+
+@JsonClass(generateAdapter = true)
+data class GeminiResponse(val candidates: List<Candidate>?)
+
+@JsonClass(generateAdapter = true)
+data class Candidate(val content: ContentResponse?)
+
+@JsonClass(generateAdapter = true)
+data class ContentResponse(val parts: List<PartResponse>?)
+
+@JsonClass(generateAdapter = true)
+data class PartResponse(val text: String?)
+
+// Interface Retrofit com o endpoint oficial do gemini-3.8-flash
+interface GeminiApi {
+    @POST("v1beta/models/gemini-3.8-flash:generateContent")
+    suspend fun generateContent(
+        @Query("key") apiKey: String,
+        @Body request: GeminiRequest
+    ): GeminiResponse
+}
 
 class GeminiApiService {
 
-    // Modelo generativo inicializado via Firebase AI Logic (idêntico ao Museum Assistant do JetPacker)
-    private val generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI())
-        .generativeModel(
-            modelName = "gemini-3.5-flash-lite",
-            systemInstruction = content {
-                text(
-                    "Você é um assistente calmo, sábio e acolhedor de mindfulness no aplicativo MindfulDays. " +
-                    "Seu propósito é gerar reflexões serenas para cultivar a atenção plena no dia a dia com base nas 9 atitudes de Jon Kabat-Zinn. " +
-                    "Responda sempre com no máximo 2 frases curtas, poéticas e inspiradoras. " +
-                    "Nunca use formatação complexa ou markdown, utilize texto simples e sereno."
-                )
-            }
-        )
-
-    /**
-     * Gera uma reflexão diária personalizada para a atitude informada.
-     */
-    suspend fun generateReflection(attitudeTitle: String): String = withContext(Dispatchers.IO) {
-        try {
-            val prompt = "Escreva uma reflexão inspiradora de 2 frases sobre a atitude de mindfulness: $attitudeTitle."
-            val response = generativeModel.generateContent(prompt)
-            response.text?.trim() ?: "Acolha o momento presente exatamente como ele se manifesta."
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            // Fallback amigável para modo offline ou erro de comunicação
-            "Conectado no modo offline. Pratique a reflexão: Respire fundo e traga sua atenção para o momento presente."
+    private val api: GeminiApi by lazy {
+        // Interceptor de log para depuração no Logcat durante o desenvolvimento
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
         }
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+
+        // Configuração do Moshi com suporte completo a classes Kotlin
+        val moshi = Moshi.Builder()
+            .addLast(KotlinJsonAdapterFactory())
+            .build()
+
+        Retrofit.Builder()
+            .baseUrl("https://generativelanguage.googleapis.com/")
+            .client(client)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(GeminiApi::class.java)
     }
 
     /**
-     * Bônus: Suporte a Chat Interativo Multi-Turno (idêntico ao Chatbot do JetPacker).
+     * Gera uma reflexão diária personalizada para a atitude informada usando o modelo gemini-3.8-flash,
+     * adaptando o idioma do prompt e resposta para o idioma do usuário (pt, en, es).
      */
-    fun startMindfulnessChat() = generativeModel.startChat()
+    suspend fun generateReflection(
+        attitudeTitle: String,
+        languageCode: String = java.util.Locale.getDefault().language
+    ): String = withContext(Dispatchers.IO) {
+        try {
+            val apiKey = BuildConfig.GEMINI_API_KEY
+            if (apiKey.isBlank()) {
+                return@withContext getOfflineFallback(languageCode)
+            }
+
+            val (systemInstruction, userPrompt) = when (languageCode.lowercase().take(2)) {
+                "en" -> Pair(
+                    "You are a calm, wise and welcoming mindfulness assistant in the MindfulDays application. " +
+                        "Your purpose is to generate serene reflections to cultivate daily mindfulness based on Jon Kabat-Zinn's 9 attitudes. " +
+                        "Always respond with at most 2 short, poetic and inspiring sentences. " +
+                        "CRITICAL REQUIREMENT: Your entire response MUST be written in English. " +
+                        "Never use complex formatting or markdown, use simple and serene plain text.",
+                    "Write an inspiring 2-sentence reflection about the mindfulness attitude: \"$attitudeTitle\".\n" +
+                        "Requested Language: English. Please write the entire reflection strictly in English."
+                )
+                "es" -> Pair(
+                    "Eres un asistente sereno, sabio y acogedor de mindfulness en la aplicación MindfulDays. " +
+                        "Tu propósito es generar reflexiones breves para cultivar la atención plena diaria según las 9 actitudes de Jon Kabat-Zinn. " +
+                        "Responde siempre con un máximo de 2 oraciones breves, poéticas e inspiradoras. " +
+                        "REQUISITO OBLIGATORIO: Toda tu respuesta DEBE estar escrita en español. " +
+                        "Nunca utilices markdown complejo ni caracteres especiales, utiliza texto plano y sereno.",
+                    "Escribe una reflexión inspiradora de 2 oraciones sobre la actitud de mindfulness: \"$attitudeTitle\".\n" +
+                        "Idioma solicitado: Español. Por favor, escribe toda la reflexión estrictamente en español."
+                )
+                else -> Pair(
+                    "Você é um assistente calmo, sábio e acolhedor de mindfulness no aplicativo MindfulDays. " +
+                        "Seu propósito é gerar reflexões serenas para cultivar a atenção plena no dia a dia com base nas 9 atitudes de Jon Kabat-Zinn. " +
+                        "Responda sempre com no máximo 2 frases curtas, poéticas e inspiradoras. " +
+                        "REQUISITO OBRIGATÓRIO: Toda a sua resposta DEVE ser gerada em português. " +
+                        "Nunca use formatação complexa ou markdown, utilize texto simples e sereno.",
+                    "Escreva uma reflexão inspiradora de 2 frases sobre a atitude de mindfulness: \"$attitudeTitle\".\n" +
+                        "Idioma solicitado: Português. Por favor, escreva toda a reflexão estritamente em português."
+                )
+            }
+
+            val request = GeminiRequest(
+                contents = listOf(
+                    Content(parts = listOf(Part(text = "$systemInstruction\n\n$userPrompt")))
+                )
+            )
+
+            val response = api.generateContent(apiKey = apiKey, request = request)
+            val reflection = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text?.trim()
+            reflection ?: getDefaultFallback(languageCode)
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            android.util.Log.e("GeminiApiService", "Erro ao gerar reflexão via Retrofit", e)
+            getOfflineFallback(languageCode)
+        }
+    }
+
+    private fun getOfflineFallback(languageCode: String): String = when (languageCode.lowercase()) {
+        "en" -> "Connected in offline mode. Practice this reflection: Take a deep breath and bring your awareness to the present moment."
+        "es" -> "Conectado en modo offline. Practica la reflexión: Respira profundo y enfoca tu atención en el momento presente."
+        else -> "Conectado no modo offline. Pratique a reflexão: Respire fundo e traga sua atenção para o momento presente."
+    }
+
+    private fun getDefaultFallback(languageCode: String): String = when (languageCode.lowercase()) {
+        "en" -> "Welcome the present moment exactly as it unfolds."
+        "es" -> "Acoge el momento presente exactamente como se manifiesta."
+        else -> "Acolha o momento presente exatamente como ele se manifesta."
+    }
 }
 ```
 
@@ -365,6 +600,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 data class MindfulnessUiState(
     val attitude: MindfulnessAttitude,
@@ -382,11 +618,14 @@ class MindfulnessViewModel(
     )
     val uiState: StateFlow<MindfulnessUiState> = _uiState.asStateFlow()
 
-    fun generateAiReflection() {
+    fun generateAiReflection(
+        attitudeTitle: String? = null,
+        languageCode: String = Locale.getDefault().language
+    ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingAi = true) }
-            val attitudeTitle = _uiState.value.attitude.title
-            val reflection = geminiService.generateReflection(attitudeTitle)
+            val title = attitudeTitle ?: _uiState.value.attitude.name
+            val reflection = geminiService.generateReflection(title, languageCode)
             _uiState.update {
                 it.copy(
                     aiReflection = reflection,
@@ -400,9 +639,9 @@ class MindfulnessViewModel(
 
 ---
 
-## 📱 3.5. Implementando a Home Screen em Jetpack Compose
+## 📱 3.6. Implementando a Home Screen em Jetpack Compose com Strings Internacionalizadas
 
-Crie o arquivo em `dev/mindfuldays/app/ui/home/HomeScreen.kt`:
+Crie o arquivo em `dev/mindfuldays/app/ui/home/HomeScreen.kt` utilizando `stringResource(...)` para todas as labels e textos:
 
 ```kotlin
 package dev.mindfuldays.app.ui.home
@@ -417,11 +656,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.mindfuldays.app.R
 import dev.mindfuldays.app.data.model.MindfulnessAttitude
+import dev.mindfuldays.app.data.repository.AttitudeRepository
+import dev.mindfuldays.app.ui.theme.MindfulDaysTheme
 import dev.mindfuldays.app.ui.viewmodel.MindfulnessViewModel
 
 @Composable
@@ -432,12 +676,19 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val localizedAttitudeName = if (uiState.attitude.nameRes != 0) {
+        stringResource(uiState.attitude.nameRes)
+    } else {
+        uiState.attitude.name
+    }
 
     HomeScreenContent(
         attitude = uiState.attitude,
         aiReflection = uiState.aiReflection,
         isLoadingAi = uiState.isLoadingAi,
-        onGenerateAiReflection = { viewModel.generateAiReflection() },
+        onGenerateAiReflection = {
+            viewModel.generateAiReflection(attitudeTitle = localizedAttitudeName)
+        },
         onNavigateToSettings = onNavigateToSettings,
         onNavigateToTimer = onNavigateToTimer,
         modifier = modifier
@@ -475,13 +726,13 @@ fun HomeScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "MINDFULDAYS",
+                    text = stringResource(R.string.app_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color(0xFF6B8E23),
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Atitude ${attitude.id} de 9",
+                    text = stringResource(R.string.attitude_counter, attitude.id, 9),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -489,7 +740,7 @@ fun HomeScreenContent(
             IconButton(onClick = onNavigateToSettings) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Configurações"
+                    contentDescription = stringResource(R.string.cd_settings)
                 )
             }
         }
@@ -511,13 +762,13 @@ fun HomeScreenContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = attitude.title,
+                    text = if (attitude.nameRes != 0) stringResource(attitude.nameRes) else attitude.name,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = attitude.description,
+                    text = if (attitude.descriptionRes != 0) stringResource(attitude.descriptionRes) else attitude.description,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -526,7 +777,7 @@ fun HomeScreenContent(
                     thickness = 1.dp
                 )
                 Text(
-                    text = if (aiReflection.isNotBlank()) aiReflection else "“Respire fundo e traga sua atenção para o momento presente.”",
+                    text = if (aiReflection.isNotBlank()) aiReflection else stringResource(R.string.default_reflection),
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -550,7 +801,7 @@ fun HomeScreenContent(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "✨ Nova Reflexão (Gemini IA)")
+                        Text(text = stringResource(R.string.btn_new_reflection))
                     }
                 }
             }
@@ -564,7 +815,7 @@ fun HomeScreenContent(
                 .padding(bottom = 8.dp)
         ) {
             Text(
-                text = "⏱️ Iniciar Timer de Meditação",
+                text = stringResource(R.string.btn_start_timer),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -574,4 +825,4 @@ fun HomeScreenContent(
 
 ---
 
-Com as telas e a comunicação com a API prontas, o app está pronto para testes e automação. Avançamos para o **Módulo 4: Qualidade, Testes e CI/CD com GitHub Actions**.
+Com as telas internacionalizadas e a comunicação multilíngue com a Gemini API prontas, avançamos para o **Módulo 4: Qualidade de Software, Testes Automatizados com IA e Robot Pattern**.

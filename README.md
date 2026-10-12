@@ -31,7 +31,7 @@
 | **01** | [Módulo 1: Diseño UI y Stitch](./es/01-diseno-ui-stitch.md) | [Módulo 1: Design UI e Stitch](./pt/01-design-ui-stitch.md) |
 | **02** | [Módulo 2: Setup Android Studio con IA](./es/02-setup-android-studio-ia.md) | [Módulo 2: Setup Android Studio com IA](./pt/02-setup-android-studio-ai.md) |
 | **03** | [Módulo 3: AGENTS.md, Compose y Gemini API](./es/03-implementacion-compose-y-logica.md) | [Módulo 3: AGENTS.md, Compose e Gemini API](./pt/03-implementacao-compose-e-logica.md) |
-| **04** | [Módulo 4: Pruebas y CI/CD con GitHub Actions](./es/04-calidad-pruebas-cicd.md) | [Módulo 4: Testes e CI/CD com GitHub Actions](./pt/04-qualidade-testes-cicd.md) |
+| **04** | [Módulo 4: Calidad, Pruebas con IA y Robot Pattern](./es/04-calidad-pruebas-cicd.md) | [Módulo 4: Qualidade, Testes com IA e Robot Pattern](./pt/04-qualidade-testes-cicd.md) |
 
 ---
 

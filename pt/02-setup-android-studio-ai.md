@@ -39,6 +39,7 @@ You are an expert Android developer. Create a minimalist Android application nam
 
 Use the attached Stitch UI screenshots as the exact visual reference and follow these prescriptive rules:
 - UI STYLE & TYPOGRAPHY: Strict minimalist design for a workshop tutorial. Use Android system fonts ONLY (default sans-serif / Roboto). Use native Android Material 3 components ONLY (Button, OutlinedButton, FilledIconButton, OutlinedIconButton, ElevatedCard, Card, TopAppBar, Switch, HorizontalDivider). Do NOT create complex custom UI components.
+- INTERNATIONALIZATION (i18n): Never hardcode user-facing text strings in Composables. All labels, titles, descriptions, and button texts MUST be loaded using stringResource(R.string...) from resource files: 'res/values/strings.xml' (default / English), 'res/values-pt/strings.xml' (Portuguese), and 'res/values-es/strings.xml' (Spanish).
 - COLOR PALETTE:
   * Primary: Sage Green (#6B8E23)
   * Secondary / Divider: Muted Sand (#E8DFD8)
@@ -120,28 +121,30 @@ Since this project will be built progressively across workshop modules, generate
 1. FULLY IMPLEMENTED NOW (UI & Design Tokens):
    - ui/theme/ (Color.kt, Theme.kt, Type.kt): Fully implemented with the required Material 3 color tokens and system fonts.
    - ui/home/HomeScreen.kt, ui/timer/TimerScreen.kt, ui/settings/SettingsScreen.kt: Fully implement the declarative Composable layouts according to the exact screen specifications above.
-     * In HomeScreen.kt, implement a stateful 'HomeScreen(viewModel: MindfulnessViewModel, onNavigateToSettings: () -> Unit, onNavigateToTimer: () -> Unit)' that collects 'viewModel.uiState' with lifecycle and delegates to a stateless 'HomeScreenContent'.
-   - data/model/MindfulnessAttitude.kt: Data class fully defined with attributes id, title, and description:
-     data class MindfulnessAttitude(val id: Int, val title: String, val description: String)
+      * In HomeScreen.kt, implement a stateful 'HomeScreen(viewModel: MindfulnessViewModel, onNavigateToSettings: () -> Unit, onNavigateToTimer: () -> Unit)' that collects 'viewModel.uiState' with lifecycle and delegates to a stateless 'HomeScreenContent'.
+   - data/model/MindfulnessAttitude.kt: Data class fully defined with string resource IDs for i18n support:
+     data class MindfulnessAttitude(val id: Int, val name: String = "", val description: String = "", @get:StringRes val nameRes: Int = 0, @get:StringRes val descriptionRes: Int = 0)
    - MainActivity.kt: Instantiates 'viewModel: MindfulnessViewModel = viewModel()' and performs simple state-based navigation between HomeScreen, TimerScreen, and SettingsScreen.
 
 2. GENERATE AS EMPTY SKELETONS / STUBS (TO BE FILLED IN SUBSEQUENT WORKSHOP MODULE 3):
-   - data/remote/GeminiApiService.kt: Generate as a SKELETON class stub with a placeholder method and a TODO comment (students will implement this with Firebase AI Logic in Module 3):
-     // TODO: Implement Google Gemini API call with Firebase AI Logic in Module 3
+   - data/remote/GeminiApiService.kt: Generate as a SKELETON class stub with a placeholder method accepting languageCode and a TODO comment (students will implement this with Retrofit & Gemini API in Module 3):
+     // TODO: Implement Google Gemini API call with Retrofit in Module 3
      class GeminiApiService {
-         suspend fun generateReflection(attitudeTitle: String): String = "Respire fundo e traga sua atenção para o momento presente."
+         suspend fun generateReflection(attitudeTitle: String, languageCode: String = "pt"): String = "Respire fundo e traga sua atenção para o momento presente."
      }
    - data/repository/AttitudeRepository.kt: Generate as a SKELETON class stub with the exact method signature expected in Module 3 and a TODO comment:
      // TODO: Implement 9 Jon Kabat-Zinn attitudes & daily rotation in Module 3
      class AttitudeRepository {
          fun getTodayAttitude(): MindfulnessAttitude = MindfulnessAttitude(
              id = 3,
-             title = "Aceitação",
-             description = "Reconheça e acolha o momento presente exatamente como ele é."
+             name = "Aceitação",
+             description = "Reconheça e acolha o momento presente exatamente como ele é.",
+             nameRes = R.string.attitude_3_name,
+             descriptionRes = R.string.attitude_3_desc
          )
      }
    - ui/viewmodel/MindfulnessViewModel.kt: Generate as an INITIAL SKELETON ViewModel with MindfulnessUiState (attitude, aiReflection, isLoadingAi) and StateFlow matching Module 3:
-     // TODO: Connect Firebase AI Logic and real Gemini API integration in Module 3
+     // TODO: Connect Gemini API integration in Module 3
      data class MindfulnessUiState(
          val attitude: MindfulnessAttitude,
          val aiReflection: String = "“Acolher o presente não é conformismo, é o ponto de partida para qualquer transformação real.”",
@@ -161,7 +164,7 @@ Since this project will be built progressively across workshop modules, generate
              viewModelScope.launch {
                  _uiState.update { it.copy(isLoadingAi = true) }
                  delay(1000) // Simulated delay for UI preview
-                 val reflection = geminiService.generateReflection(_uiState.value.attitude.title)
+                 val reflection = geminiService.generateReflection(_uiState.value.attitude.name)
                  _uiState.update {
                      it.copy(
                          aiReflection = reflection,

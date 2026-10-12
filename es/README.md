@@ -48,7 +48,7 @@ Sigue los archivos `.md` en la secuencia propuesta para completar el workshop:
 1. [**`01-diseno-ui-stitch.md`**](./01-diseno-ui-stitch.md) — *Paso 1: Prototipado Visual, Sitemap y Design System en Google Stitch (Versión Sintética)*
 2. [**`02-setup-android-studio-ia.md`**](./02-setup-android-studio-ia.md) — *Paso 2: Configuración de Android Studio Estable e Inicialización con Create with AI*
 3. [**`03-implementacion-compose-y-logica.md`**](./03-implementacion-compose-y-logica.md) — *Paso 3: Directrices con AGENTS.md, Interfaz en Jetpack Compose, Reglas de las 9 Actitudes y Gemini API*
-4. [**`04-calidad-pruebas-cicd.md`**](./04-calidad-pruebas-cicd.md) — *Paso 4: Pruebas Unitarias/UI, Pipeline en GitHub Actions y Buenas Prácticas*
+4. [**`04-calidad-pruebas-cicd.md`**](./04-calidad-pruebas-cicd.md) — *Paso 4: Calidad de Software, Pruebas con IA y Robot Pattern*
 
 ---
 
