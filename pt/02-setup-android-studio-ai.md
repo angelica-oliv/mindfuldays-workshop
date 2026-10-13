@@ -70,7 +70,7 @@ IMPLEMENT EXACTLY THESE 3 SCREENS (no more, no less):
    - TopAppBar: Title "Timer de Meditação" with back navigation arrow (Icons.AutoMirrored.Filled.ArrowBack).
    - Center Area:
      * Subtitle text: "Concentre-se na respiração" (bodyLarge, muted color).
-     * Minimalist circular countdown timer: A clean circular progress ring (Canvas drawArc with stroke width 8.dp: track color #E8DFD8, progress color #6B8E23), large digital countdown text centered inside ("10:00" or mm:ss in headlineLarge/displayMedium), and status text below ("Pausado" / "Em andamento" / "Concluído").
+     * Minimalist circular countdown timer: A clean circular progress ring (Canvas drawArc with stroke width 8.dp: track color #E8DFD8, progress color #6B8E23), large digital countdown text centered inside ("10:00" or mm:ss in headlineLarge/displayMedium), and status text below ("Pausado" / "Em andamento" / "Concluído"). Plays a gentle completion notification chime via RingtoneManager when finished.
    - Bottom Controls:
      * A centered horizontal Row with exactly two buttons:
        - Reset button: OutlinedIconButton with Icons.Default.Refresh.
