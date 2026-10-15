@@ -25,7 +25,8 @@ En este workshop, los participantes aprenderán a:
 * **Reflexión con Gemini API**: Botón para generar consejos y meditaciones guiadas en tiempo real mediante IA generativa.
 * **Temporizador de Meditación**: Contador circular minimalista de concentración con controles de Play, Pause y Reset, además de emitir una señal sonora suave al finalizar.
 * **Configuración y Notificaciones**: Opción de programación de recordatorios diarios para mantener la práctica.
-* **Internacionalización (i18n)**: Soporte nativo para Español e Inglés.
+* **Internacionalización (i18n)**: Soporte nativo para Español, Portugués e Inglés.
+* **Soporte para Modo Oscuro**: Tema oscuro integrado con Material Design 3 y alto contraste.
 
 ---
 
@@ -45,22 +46,23 @@ Antes de iniciar los módulos prácticos, asegúrate de contar con los siguiente
 
 Sigue los archivos `.md` en la secuencia propuesta para completar el workshop:
 
-1. [**`01-diseno-ui-stitch.md`**](./01-diseno-ui-stitch.md) — *Paso 1: Prototipado Visual, Sitemap y Design System en Google Stitch (Versión Sintética)*
+1. [**`01-diseno-ui-stitch.md`**](./01-diseno-ui-stitch.md) — *Paso 1: Prototipado Visual, Sitemap y Design System en Google Stitch (Modo Claro y Oscuro)*
 2. [**`02-setup-android-studio-ia.md`**](./02-setup-android-studio-ia.md) — *Paso 2: Configuración de Android Studio Estable e Inicialización con Create with AI*
-3. [**`03-implementacion-compose-y-logica.md`**](./03-implementacion-compose-y-logica.md) — *Paso 3: Directrices con AGENTS.md, Interfaz en Jetpack Compose, Reglas de las 9 Actitudes y Gemini API*
-4. [**`04-calidad-pruebas-cicd.md`**](./04-calidad-pruebas-cicd.md) — *Paso 4: Calidad de Software, Pruebas con IA y Robot Pattern*
+3. [**`03-implementacion-compose-y-logica.md`**](./03-implementacion-compose-y-logica.md) — *Paso 3: Directrices con AGENTS.md, Interfaz en Jetpack Compose, Soporte Dual-Theme, 9 Actitudes y Gemini API*
+4. [**`04-calidad-pruebas-cicd.md`**](./04-calidad-pruebas-cicd.md) — *Paso 4: Calidad de Software, Pruebas con IA y Robot Pattern (+ Pasos Opcionales: Ícono de la App con IA y Publicación en Play Store)*
 
 ---
 
 ## 🎨 Paleta de Colores del Proyecto (Material Design 3)
 
-| Elemento | Nombre del Color | Hexadecimal |
-| :--- | :--- | :--- |
-| **Primary** | Verde Salvia | `#6B8E23` |
-| **Secondary** | Arena Muted | `#E8DFD8` |
-| **Background** | Blanco Cálido (Off-White) | `#FBF9F5` |
-| **Surface** | Blanco Puro | `#FFFFFF` |
-| **Text Primary** | Verde Bosque Oscuro | `#2C3E35` |
+| Token M3 | Modo Claro (Light) | Modo Oscuro (Dark) | Descripción |
+| :--- | :--- | :--- | :--- |
+| **Primary** | `#6B8E23` (Verde Salvia) | `#A8C673` (Salvia Luminoso) | Destacados y botones principales |
+| **Primary Container** | `#8FA853` (Salvia Suave) | `#2E4239` (Bosque Nocturno Elevado) | Contenedores de realce |
+| **Secondary** | `#E8DFD8` (Arena Muted) | `#A3B5A8` (Salvia Muted Suave) | Elementos secundarios |
+| **Background** | `#FBF9F5` (Blanco Cálido) | `#15201A` (Bosque Nocturno Profundo) | Fondo de la pantalla completa |
+| **Surface** | `#FFFFFF` (Blanco Puro) | `#22322A` (Bosque Nocturno Elevado) | Fondo de tarjetas elevadas |
+| **OnSurface / Text** | `#2C3E35` (Verde Bosque) | `#F1EFEA` (Blanco Cálido Claro) | Textos y títulos de alto contraste |
 
 ---
 

@@ -26,12 +26,24 @@ IMPORTANT DESIGN SYSTEM CONSTRAINTS (STRICT):
 - Typography: Use standard Android system default typography (Roboto / system sans-serif). DO NOT use custom, serif, or imported fonts (no Newsreader, no Plus Jakarta Sans).
 - Layout: Pure single-column layout with generous whitespace. Keep screens extremely simple and didactic for a live-coding workshop.
 - Internationalization Readiness: All UI text elements, titles, and button labels must be concise and semantic, designed to map cleanly into Android string resources (English default, Portuguese, Spanish).
-- Color Palette:
-  * Primary: Soft sage green (#6B8E23)
-  * Secondary / Dividers: Sand / Muted beige (#E8DFD8)
-  * Background: Warm off-white (#FBF9F5)
-  * Surface / Cards: Pure white (#FFFFFF)
-  * Text / Icons: Dark forest green (#2C3E35)
+- Color Palette & Dual-Theme Support (Light & Dark Mode):
+  * Light Mode:
+    - Primary: Soft sage green (#6B8E23)
+    - Primary Container / Accent: Soft sage (#8FA853)
+    - Secondary / Dividers: Sand / Muted beige (#E8DFD8)
+    - Background: Warm off-white (#FBF9F5)
+    - Surface / Cards: Pure white (#FFFFFF)
+    - Text / Icons: Dark forest green (#2C3E35)
+    - Text Secondary: Muted forest green (#5C6F64)
+  * Dark Mode:
+    - Primary: Luminous sage green (#A8C673)
+    - Primary Container: Deep forest elevated (#2E4239)
+    - Secondary / Dividers: Subtle forest outline (#3B5045)
+    - Background: Deep tranquil forest night (#15201A)
+    - Surface / Cards: Elevated forest surface (#22322A)
+    - Text / Icons: Warm off-white (#F1EFEA)
+    - Text Secondary: Soft muted sage (#A3B5A8)
+  * Semantic Consistency: Ensure all card containers, screen backgrounds, and texts use semantic Material 3 tokens so that switching themes provides excellent contrast without white-on-white text issues.
 
 REQUIRED SCREENS & EXACT ELEMENTS:
 
@@ -70,15 +82,22 @@ REQUIRED SCREENS & EXACT ELEMENTS:
 
 ---
 
-## 🎨 1.3. Extração de Assets e Tokens
+## 🎨 1.3. Extração de Assets e Tokens (Material Design 3)
 
 Após gerar as telas no [Google Stitch](https://stitch.withgoogle.com/):
 1. Capture screenshots em alta resolução das 3 telas geradas (você usará essas imagens no Módulo 2 no Android Studio).
-2. Anote os tokens de cores para configuração no **Jetpack Compose**:
-   * `Primary`: `#6B8E23` (Sage Green)
-   * `Secondary`: `#E8DFD8` (Sand)
-   * `Background`: `#FBF9F5` (Warm Off-White)
-   * `OnBackground`: `#2C3E35` (Dark Forest Green)
+2. Anote os tokens de cores para configuração no **Jetpack Compose**, prevendo suporte para **Modo Claro** e **Modo Escuro**:
+
+| Token M3 | Modo Claro (Light) | Modo Escuro (Dark) | Descrição |
+| :--- | :--- | :--- | :--- |
+| `primary` | `#6B8E23` (Sage Green) | `#A8C673` (Luminous Sage) | Ações principais e botões de destaque |
+| `primaryContainer` | `#8FA853` (Sage Light) | `#2E4239` (Forest Surface Variant) | Contêineres de destaque |
+| `secondary` | `#E8DFD8` (Muted Sand) | `#A3B5A8` (Soft Muted Sage) | Elementos secundários |
+| `background` | `#FBF9F5` (Warm Off-White) | `#15201A` (Forest Night) | Fundo da tela inteira |
+| `surface` | `#FFFFFF` (Pure White) | `#22322A` (Forest Surface) | Fundo de cards elevados |
+| `onSurface` | `#2C3E35` (Dark Forest Green) | `#F1EFEA` (Warm Off-White Text) | Títulos e textos de alto contraste |
+| `onSurfaceVariant` | `#5C6F64` (Muted Forest) | `#A3B5A8` (Soft Muted Sage) | Subtítulos e descrições secundárias |
+| `outlineVariant` | `#E8DFD8` (Sand) | `#3B5045` (Forest Outline) | Divisores e bordas de botões |
 
 ---
 

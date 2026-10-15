@@ -49,30 +49,45 @@ Este archivo actúa como la fuente de verdad para agentes de IA y herramientas d
   - `ui/viewmodel/`: ViewModels que exponen estados mediante `StateFlow`.
 - **Paquete Base**: `dev.mindfuldays.app`.
 
-## 🎨 Design Tokens (Material Design 3)
-Respeta estrictamente la paleta de colores definida en los prototipos de Google Stitch:
-- `SageGreen` (`#6B8E23`): Color primario (calma, enfoque).
-- `SageGreenLight` (`#8FA853`): Variante suave para destacados secundarios.
-- `SandMuted` (`#E8DFD8`): Color secundario y divisores.
-- `WarmOffWhite` (`#FBF9F5`): Fondo predeterminado de las pantallas.
-- `PureWhite` (`#FFFFFF`): Fondo de tarjetas elevadas y superficies.
-- `ForestDark` (`#2C3E35`): Texto principal e íconos de alto contraste.
+## 🎨 Design Tokens & Temas (Material Design 3 — Light & Dark Mode)
+Respeta estrictamente los tokens semánticos de colores de Material 3, garantizando soporte perfecto y contraste adecuado tanto en tema claro como oscuro:
+
+### Tema Claro (Light Theme):
+- `primary`: Verde Salvia (`#6B8E23`)
+- `primaryContainer`: Salvia Suave (`#8FA853`)
+- `secondary`: Arena Muted (`#E8DFD8`)
+- `background`: Blanco Cálido (`#FBF9F5`)
+- `surface`: Blanco Puro (`#FFFFFF`)
+- `onBackground` / `onSurface`: Verde Bosque Oscuro (`#2C3E35`)
+- `onSurfaceVariant`: Verde Bosque Suave (`#5C6F64`)
+- `outlineVariant`: Arena Muted (`#E8DFD8`)
+
+### Tema Oscuro (Dark Theme):
+- `primary`: Salvia Luminoso (`#A8C673`)
+- `primaryContainer`: Bosque Oscuro Elevado (`#2E4239`)
+- `secondary`: Salvia Suave (`#A3B5A8`)
+- `background`: Bosque Nocturno Profundo (`#15201A`)
+- `surface`: Bosque Nocturno Elevado (`#22322A`)
+- `onBackground` / `onSurface`: Blanco Cálido Claro (`#F1EFEA`)
+- `onSurfaceVariant`: Salvia Muted Claro (`#A3B5A8`)
+- `outlineVariant`: Borde Sutil de Bosque (`#3B5045`)
 
 ## 🧠 Reglas de Negocio Fundamentales
 1. **Regla de las 9 Actitudes**: La lista contiene exactamente 9 actitudes fijas. La actitud del día se calcula determinísticamente a partir del día del año:
    `val index = (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) - 1) % 9`
 2. **Gemini API (Reflexiones Diarias)**:
    - Utilizar el endpoint del modelo `gemini-3.8-flash:generateContent`.
-   - Generar reflexiones concisas e inspiradoras con un máximo de 2 oraciones por actitud.
+   - Generar reflexiones concisas e inspiradoras con un máximo de 2 oraciones por actitud, respetando el idioma del usuario (pt, en, es).
    - Manejar la ausencia de clave de API y errores de red con un mensaje amigable offline sin romper la app.
 
 ## 🛠️ Comandos de Verificación e Validación
 Verifica siempre los cambios utilizando los siguientes comandos en la terminal:
 - **Compilación de la app**: `./gradlew assembleDebug`
 - **Pruebas Unitarias**: `./gradlew testDebugUnitTest`
-- **Linter y Análisis Estático**: `./gradlew lintDebug`
+- **Pruebas de UI (Robot Pattern)**: `./gradlew connectedDebugAndroidTest`
 
 ## 🚫 Restricciones Estrictas (Guardrails)
+- **NUNCA utilices colores hexadecimales hardcodeados en Composables** (`Color(0xFF...)`). Utiliza siempre `MaterialTheme.colorScheme.background`, `MaterialTheme.colorScheme.surface`, `MaterialTheme.colorScheme.onSurface`, etc., para evitar problemas de contraste en el Modo Oscuro.
 - **NUNCA** hagas commit ni dejes credenciales o claves de API (`apiKey`) en el código versionado. La clave debe configurarse en `local.properties` y consumirse mediante `BuildConfig.GEMINI_API_KEY`.
 - **NO** mezcles lógica de negocio o llamadas asíncronas de red directamente dentro de funciones `@Composable`.
 - Mantén las funciones Composable limpias y desacopladas, utilizando parámetros para eventos y lambdas (`onAction: () -> Unit`) para facilitar pruebas de UI.
@@ -639,13 +654,122 @@ class MindfulnessViewModel(
 
 ---
 
-## 📱 3.6. Implementando la Home Screen en Jetpack Compose con Cadenas Internacionalizadas
+## 🎨 3.5. Configuración del Design System: Soporte Completo para Modo Claro y Oscuro (`Color.kt` y `Theme.kt`)
 
-Crea el archivo en `dev/mindfuldays/app/ui/home/HomeScreen.kt` utilizando `stringResource(...)` para todos los textos y etiquetas:
+Para asegurar que la aplicación brinde una experiencia visual acogedora y legible bajo cualquier condición de iluminación, configuramos el soporte nativo para **Modo Claro (Light Theme)** y **Modo Oscuro (Dark Theme)** en Material Design 3.
+
+> [!CAUTION]
+> **El Peligro de Hardcodear Colores en Composables:**
+> Si defines colores fijos como `Color(0xFFFFFFFF)` o `Color(0xFFFBF9F5)` directamente en los layouts, el texto de la interfaz (que por defecto en Material 3 cambia a colores claros en Modo Oscuro mediante `onSurface`) se volverá invisible, generando el clásico problema de **texto blanco sobre fondo blanco**.
+> Utiliza siempre tokens semánticos: `MaterialTheme.colorScheme.background`, `MaterialTheme.colorScheme.surface`, `MaterialTheme.colorScheme.onSurface`, `MaterialTheme.colorScheme.primary` y `MaterialTheme.colorScheme.outlineVariant`.
+
+### 1. `dev/mindfuldays/app/ui/theme/Color.kt`
+```kotlin
+package dev.mindfuldays.app.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// Paleta Light Theme (Material Design 3)
+val SageGreen = Color(0xFF6B8E23)
+val SageGreenLight = Color(0xFF8FA853)
+val MutedSand = Color(0xFFE8DFD8)
+val WarmOffWhite = Color(0xFFFBF9F5)
+val PureWhite = Color(0xFFFFFFFF)
+val DarkForestGreen = Color(0xFF2C3E35)
+val MutedForestGreen = Color(0xFF5C6F64)
+
+// Paleta Dark Theme (Material Design 3)
+val LuminousSage = Color(0xFFA8C673)
+val ForestNight = Color(0xFF15201A)
+val ForestSurface = Color(0xFF22322A)
+val ForestSurfaceVariant = Color(0xFF2E4239)
+val SoftMutedSage = Color(0xFFA3B5A8)
+val ForestOutline = Color(0xFF3B5045)
+val WarmOffWhiteText = Color(0xFFF1EFEA)
+```
+
+### 2. `dev/mindfuldays/app/ui/theme/Theme.kt`
+```kotlin
+package dev.mindfuldays.app.ui.theme
+
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+
+private val LightColorScheme = lightColorScheme(
+    primary = SageGreen,
+    onPrimary = PureWhite,
+    primaryContainer = SageGreenLight,
+    onPrimaryContainer = PureWhite,
+    secondary = MutedSand,
+    onSecondary = DarkForestGreen,
+    background = WarmOffWhite,
+    onBackground = DarkForestGreen,
+    surface = PureWhite,
+    onSurface = DarkForestGreen,
+    surfaceVariant = Color(0xFFF2ECE6),
+    onSurfaceVariant = MutedForestGreen,
+    outline = MutedSand,
+    outlineVariant = MutedSand
+)
+
+private val DarkColorScheme = darkColorScheme(
+    primary = LuminousSage,
+    onPrimary = Color(0xFF1E3500),
+    primaryContainer = ForestSurfaceVariant,
+    onPrimaryContainer = LuminousSage,
+    secondary = SoftMutedSage,
+    onSecondary = ForestNight,
+    background = ForestNight,
+    onBackground = WarmOffWhiteText,
+    surface = ForestSurface,
+    onSurface = WarmOffWhiteText,
+    surfaceVariant = ForestSurfaceVariant,
+    onSurfaceVariant = SoftMutedSage,
+    outline = ForestOutline,
+    outlineVariant = ForestOutline
+)
+
+@Composable
+fun MindfulDaysTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}
+```
+
+---
+
+## 📱 3.6. Implementando la Home Screen en Jetpack Compose con Tokens Semánticos y Cadenas Internacionalizadas
+
+Crea el archivo en `dev/mindfuldays/app/ui/home/HomeScreen.kt` utilizando `stringResource(...)` para todos los textos y tokens semánticos de colores:
 
 ```kotlin
 package dev.mindfuldays.app.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -655,7 +779,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -708,7 +831,7 @@ fun HomeScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFFBF9F5))
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(24.dp),
@@ -728,7 +851,7 @@ fun HomeScreenContent(
                 Text(
                     text = stringResource(R.string.app_title),
                     style = MaterialTheme.typography.labelLarge,
-                    color = Color(0xFF6B8E23),
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
@@ -740,7 +863,8 @@ fun HomeScreenContent(
             IconButton(onClick = onNavigateToSettings) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.cd_settings)
+                    contentDescription = stringResource(R.string.cd_settings),
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -751,7 +875,7 @@ fun HomeScreenContent(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
             colors = CardDefaults.elevatedCardColors(
-                containerColor = Color(0xFFFFFFFF)
+                containerColor = MaterialTheme.colorScheme.surface
             ),
             elevation = CardDefaults.elevatedCardElevation(
                 defaultElevation = 4.dp
@@ -773,7 +897,7 @@ fun HomeScreenContent(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 HorizontalDivider(
-                    color = Color(0xFFE8DFD8),
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     thickness = 1.dp
                 )
                 Text(
@@ -786,6 +910,10 @@ fun HomeScreenContent(
                 Button(
                     onClick = onGenerateAiReflection,
                     enabled = !isLoadingAi,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (isLoadingAi) {
@@ -810,6 +938,10 @@ fun HomeScreenContent(
         // Acción de Navegación hacia el Temporizador
         OutlinedButton(
             onClick = onNavigateToTimer,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)

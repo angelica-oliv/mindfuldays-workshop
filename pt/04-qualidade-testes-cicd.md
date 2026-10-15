@@ -310,5 +310,102 @@ Para encerrar o workshop com sucesso, faça a verificação completa do projeto 
 
 ---
 
+## 🎁 4.7. Passo Opcional: Geração do Ícone do App com IA (Adaptive Icons & Asset Studio)
+
+No Android moderno (Android 8.0 Oreo até Android 15+), os ícones dos aplicativos utilizam a especificação de **Adaptive Icons** (Ícones Adaptáveis), compostos por duas camadas principais:
+1. **Camada de Primeiro Plano (Foreground)**: A ilustração ou símbolo central (ex: flor de lótus minimalista ou pedra zen em verde sálvia).
+2. **Camada de Fundo (Background)**: Cor sólida ou gradiente sutil de fundo (`#FBF9F5` ou `#15201A`).
+3. **Ícone Monocromático (Monochrome / Themed Icon)**: Utilizado a partir do Android 13 para se adaptar dinamicamente ao tema do Material You do usuário.
+
+### 🎨 Prompt para Gerar a Ilustração do Ícone com IA (Gemini / ImageFX / Imagen 3)
+
+Você pode utilizar o **Google ImageFX** ou o **Gemini** para gerar a arte vetorial do ícone do MindfulDays:
+
+```text
+A minimalist, modern vector app icon foreground illustration for an Android mindfulness application named "MindfulDays".
+- Motif: An elegant, serene stylized lotus flower and a zen meditation stone circle.
+- Style: Ultra-clean flat vector illustration, pure lines, no drop shadows, centered composition.
+- Colors: Sage green (#6B8E23) and pure white accents (#FFFFFF).
+- Background: Isolated on a completely transparent background (or solid white for easy cutout).
+- Constraints: No text, no letters, no gradients, designed to fit inside a circular adaptive icon mask with 25% safe margin.
+```
+
+### 🛠️ Configurando no Android Studio via Asset Studio
+
+1. Salve a imagem gerada (PNG com fundo transparente, 512x512 ou superior).
+2. No Android Studio, clique com o botão direito na pasta `app/src/main/res` e selecione:
+   **New → Image Asset**.
+3. Na janela do **Asset Studio**:
+   - **Icon Type**: Selecione `Launcher Icons (Adaptive and Legacy)`.
+   - **Name**: Mantenha `ic_launcher`.
+   - **Foreground Layer**:
+     * **Source Asset**: Escolha `Image` e selecione o caminho do arquivo PNG gerado.
+     * **Resize**: Redimensione o slider para aproximadamente `70% - 75%` para que o ícone fique perfeitamente dentro da **Safe Zone** (zona circular de segurança).
+   - **Background Layer**:
+     * **Source Asset**: Escolha `Color` e insira o código hexadecimal da nossa paleta: `#FBF9F5` (Off-White) ou `#22322A` (Forest Surface).
+   - **Options (Legacy & Themed Icon)**:
+     * O Android Studio gerará automaticamente as versões para todas as densidades (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`), além dos ícones redondos e legados.
+4. Clique em **Next** e depois em **Finish**. O Android Studio substituirá os arquivos em `res/mipmap-*/ic_launcher*` de forma 100% automatizada!
+
+---
+
+## 🚀 4.8. Passo Opcional: Instruções para Publicação na Google Play Store
+
+Publicar o aplicativo na **Google Play Store** consolida o ciclo de desenvolvimento profissional. Abaixo estão os passos recomendados:
+
+### 1. Criar a Chave de Assinatura (Upload Keystore)
+Para publicar na Google Play, o aplicativo deve ser assinado digitalmente com uma chave criptográfica (`.jks` ou `.keystore`):
+
+1. No Android Studio, acesse o menu superior: **Build → Generate Signed Bundle / APK...**.
+2. Selecione **Android App Bundle** (o formato oficial e obrigatório para a Play Store) e clique em **Next**.
+3. Sob **Key store path**, clique em **Create new...**:
+   - **Key store path**: Escolha um local seguro fora do diretório do projeto versionado (ex: `~/keystores/mindfuldays-release.jks`).
+   - **Password**: Defina uma senha forte.
+   - **Alias**: `mindfuldays-key`.
+   - **Validity (years)**: 25 anos ou mais.
+   - **Certificate**: Preencha seu nome e organização.
+4. Guarde as senhas e o arquivo `.jks` em um gerenciador seguro. **Nunca suba o arquivo `.jks` para o GitHub**.
+
+### 2. Gerar o Android App Bundle (`.aab`) de Release
+No terminal, você pode compilar o pacote de produção otimizado com o comando:
+
+```bash
+./gradlew bundleRelease
+```
+O arquivo `.aab` será gerado em:
+`app/build/outputs/bundle/release/app-release.aab`.
+
+> [!NOTE]
+> O formato **AAB (Android App Bundle)** divide os recursos por densidade de tela, idioma e arquitetura de CPU do aparelho do usuário (Dynamic Delivery), reduzindo o tamanho do download em até 60% comparado a um APK tradicional.
+
+### 3. Preparar os Ativos da Ficha da Loja (Store Listing)
+No **[Google Play Console](https://play.google.com/console/)**:
+
+1. **Ícone do App**: 512 x 512 px (PNG de 32 bits com canal alfa).
+2. **Gráfico de Recursos (Feature Graphic)**: 1024 x 500 px (JPEG ou PNG de 24 bits sem transparência).
+3. **Capturas de Tela (Screenshots)**:
+   - Pelo menos 2 capturas de tela reais de smartphone (resolução mínima de 1080 x 1920 px).
+   - Dica: Utilize as capturas que salvamos em `screenshots/app_home.png`, `app_timer.png`, `dark_home.png` e `dark_timer.png`!
+4. **Textos da Ficha**:
+   - **Nome do App**: `MindfulDays - Meditação & IA` (até 30 caracteres).
+   - **Descrição Breve**: `Cultive serenidade diária com as 9 atitudes de mindfulness e reflexões com IA.` (até 80 caracteres).
+   - **Descrição Completa**: Descreva as 9 atitudes de Jon Kabat-Zinn, o timer circular e as reflexões via Gemini API (até 4000 caracteres). Como implementamos i18n, adicione as traduções em Inglês e Espanhol!
+
+### 4. Configurações de Política e Segurança dos Dados (Data Safety)
+Na seção **Conteúdo do App** do Play Console:
+- **Política de Privacidade**: Como o app acessa a internet para consultar a Gemini API, é obrigatório fornecer uma URL pública para a Política de Privacidade (pode ser hospedada gratuitamente no GitHub Pages).
+- **Segurança dos Dados (Data Safety)**:
+  - Informe se dados são coletados ou compartilhados. Como o app apenas envia o nome da atitude para a Gemini API sem identificar o usuário nem coletar dados pessoais, a declaração é simples e transparente.
+- **Classificação de Conteúdo**: Responda ao questionário padrão (geralmente classificação Livre / Todas as idades).
+
+### 5. Lançamento na Faixa de Teste Interno (Internal Testing)
+1. No menu lateral do Play Console, vá em **Testar → Teste Interno (Internal testing)**.
+2. Crie uma nova versão e faça o upload do arquivo `app-release.aab`.
+3. Adicione sua lista de e-mails de testadores.
+4. Clique em **Revisar e Lançar versão**.
+5. Compartilhe o link de teste com seus amigos e participantes do workshop para instalar o aplicativo diretamente pela Google Play Store!
+
+---
+
 🎉 **Parabéns!** Você concluiu todos os módulos do workshop **MindfulDays**!
-Você aprendeu na prática a prototipar telas com **Google Stitch**, estruturar diretrizes com **AGENTS.md**, integrar a **Gemini API** com **Retrofit/Moshi**, internacionalizar a aplicação em **PT, EN e ES** e garantir a qualidade do software com **Testes Unitários e Robot Pattern acelerados por IA**!
+Você aprendeu na prática a prototipar telas com **Google Stitch**, estruturar diretrizes com **AGENTS.md**, integrar a **Gemini API** com **Retrofit/Moshi**, internacionalizar a aplicação em **PT, EN e ES**, garantir a qualidade do software com **Testes Unitários e Robot Pattern acelerados por IA**, e dar os passos para publicar seu app na **Google Play Store**!

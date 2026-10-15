@@ -40,37 +40,56 @@ You are an expert Android developer. Create a minimalist Android application nam
 Use the attached Stitch UI screenshots as the exact visual reference and follow these prescriptive rules:
 - UI STYLE & TYPOGRAPHY: Strict minimalist design for a workshop tutorial. Use Android system fonts ONLY (default sans-serif / Roboto). Use native Android Material 3 components ONLY (Button, OutlinedButton, FilledIconButton, OutlinedIconButton, ElevatedCard, Card, TopAppBar, Switch, HorizontalDivider). Do NOT create complex custom UI components.
 - INTERNATIONALIZATION (i18n): Never hardcode user-facing text strings in Composables. All labels, titles, descriptions, and button texts MUST be loaded using stringResource(R.string...) from resource files: 'res/values/strings.xml' (default / English), 'res/values-es/strings.xml' (Spanish), and 'res/values-pt/strings.xml' (Portuguese).
-- COLOR PALETTE:
-  * Primary: Sage Green (#6B8E23)
-  * Secondary / Divider: Muted Sand (#E8DFD8)
-  * Background: Warm Off-White (#FBF9F5)
-  * Surface / Cards: Pure White (#FFFFFF)
-  * OnBackground / Text: Dark Forest Green (#2C3E35)
+- COLOR PALETTE & DUAL-THEME ADAPTATION (LIGHT & DARK MODE):
+  * Strictly avoid hardcoded hex colors (e.g., Color(0xFF...)) in any Composable function! Always use semantic MaterialTheme.colorScheme tokens so the UI seamlessly adapts between Light and Dark themes without contrast issues:
+    - Screen Backgrounds: MaterialTheme.colorScheme.background
+    - Surfaces / Cards: MaterialTheme.colorScheme.surface
+    - Primary actions & Branding: MaterialTheme.colorScheme.primary
+    - Titles & High contrast text: MaterialTheme.colorScheme.onSurface
+    - Subtitles & Secondary text: MaterialTheme.colorScheme.onSurfaceVariant
+    - Dividers & Outlines: MaterialTheme.colorScheme.outlineVariant
+  * Light Theme Tokens:
+    - Primary: Sage Green (#6B8E23)
+    - Primary Container: Soft Sage (#8FA853)
+    - Secondary / Dividers: Muted Sand (#E8DFD8)
+    - Background: Warm Off-White (#FBF9F5)
+    - Surface / Cards: Pure White (#FFFFFF)
+    - Text / OnSurface: Dark Forest Green (#2C3E35)
+    - Text Secondary / OnSurfaceVariant: Muted Forest Green (#5C6F64)
+  * Dark Theme Tokens:
+    - Primary: Luminous Sage (#A8C673)
+    - Primary Container: Deep Forest Surface Variant (#2E4239)
+    - Secondary: Soft Muted Sage (#A3B5A8)
+    - Background: Deep Tranquil Forest Night (#15201A)
+    - Surface / Cards: Elevated Forest Surface (#22322A)
+    - Text / OnSurface: Warm Off-White Text (#F1EFEA)
+    - Text Secondary / OnSurfaceVariant: Soft Muted Sage (#A3B5A8)
+    - Outline / Dividers: Forest Outline (#3B5045)
 
 IMPLEMENT EXACTLY THESE 3 SCREENS (no more, no less):
 
 1. Screen 1: Home Screen (HomeScreen.kt)
-   - Layout: Column with background #FBF9F5, vertical arrangement spaced between.
+   - Layout: Column with background MaterialTheme.colorScheme.background, vertical arrangement spaced between.
    - Header (Top):
      * A top Row containing:
-       - Centered column: App title "MINDFULDAYS" (MaterialTheme.typography.labelLarge, primary color) and subtitle "Actitud X de 9" (bodyMedium, muted).
-       - Top-right corner: Standard IconButton with Icons.Default.Settings to navigate to SettingsScreen.
+       - Centered column: App title "MINDFULDAYS" (MaterialTheme.typography.labelLarge, color MaterialTheme.colorScheme.primary) and subtitle "Actitud X de 9" (bodyMedium, color MaterialTheme.colorScheme.onSurfaceVariant).
+       - Top-right corner: Standard IconButton with Icons.Default.Settings (tint MaterialTheme.colorScheme.onBackground) to navigate to SettingsScreen.
    - Central Card (ElevatedCard):
-     * Container color white, elevation 4.dp, padded content.
-     * Attitude title in bold (headlineMedium, e.g., "Aceptación").
-     * Attitude description (bodyLarge, e.g., "Reconoce y acoge el momento presente exactamente como es.").
-     * Thin HorizontalDivider (color #E8DFD8).
-     * AI reflection text block (bodyMedium, italic, displaying generated reflection or default).
+     * Container color MaterialTheme.colorScheme.surface, elevation 4.dp, padded content.
+     * Attitude title in bold (headlineMedium, e.g., "Aceptación", color MaterialTheme.colorScheme.onSurface).
+     * Attitude description (bodyLarge, e.g., "Reconoce y acoge el momento presente exactamente como es.", color MaterialTheme.colorScheme.onSurface).
+     * Thin HorizontalDivider (color MaterialTheme.colorScheme.outlineVariant).
+     * AI reflection text block (bodyMedium, italic, color MaterialTheme.colorScheme.onSurfaceVariant, displaying generated reflection or default).
      * Primary filled Button with sparkle icon: "✨ Nueva Reflexión (Gemini IA)". Shows CircularProgressIndicator when loading.
    - Bottom Action:
-     * A single full-width OutlinedButton: "⏱️ Iniciar Temporizador de Meditación" navigating to TimerScreen.
+     * A single full-width OutlinedButton: "⏱️ Iniciar Temporizador de Meditación" navigating to TimerScreen (border MaterialTheme.colorScheme.outlineVariant, contentColor MaterialTheme.colorScheme.primary).
    - STRICT EXCLUSIONS: Do NOT include bottom navigation bars, profile avatars, greetings, photo banners, audio players, or habit/streak charts.
 
 2. Screen 2: Meditation Timer Screen (TimerScreen.kt)
    - TopAppBar: Title "Temporizador de Meditación" with back navigation arrow (Icons.AutoMirrored.Filled.ArrowBack).
    - Center Area:
-     * Subtitle text: "Concéntrate en la respiración" (bodyLarge, muted color).
-     * Minimalist circular countdown timer: A clean circular progress ring (Canvas drawArc with stroke width 8.dp: track color #E8DFD8, progress color #6B8E23), large digital countdown text centered inside ("10:00" or mm:ss in headlineLarge/displayMedium), and status text below ("Pausado" / "En curso" / "Completado"). Emite una señal sonora suave de finalización mediante RingtoneManager al terminar.
+     * Subtitle text: "Concéntrate en la respiración" (bodyLarge, color MaterialTheme.colorScheme.onSurfaceVariant).
+     * Minimalist circular countdown timer: A clean circular progress ring (Canvas drawArc with stroke width 8.dp: track color MaterialTheme.colorScheme.outlineVariant, progress color MaterialTheme.colorScheme.primary), large digital countdown text centered inside ("10:00" or mm:ss in headlineLarge/displayMedium, color MaterialTheme.colorScheme.onSurface), and status text below ("Pausado" / "En curso" / "Completado", color MaterialTheme.colorScheme.onSurfaceVariant). Emite una señal sonora suave de finalización mediante RingtoneManager al terminar.
    - Bottom Controls:
      * A centered horizontal Row with exactly two buttons:
        - Reset button: OutlinedIconButton with Icons.Default.Refresh.
@@ -201,8 +220,8 @@ dev.mindfuldays.app/
 │   ├── settings/
 │   │   └── SettingsScreen.kt         <- Layout Compose completo y funcional
 │   ├── theme/
-│   │   ├── Color.kt                  <- Tokens Material 3 oficiales (Salvia, Arena, Blanco Cálido)
-│   │   ├── Theme.kt
+│   │   ├── Color.kt                  <- Tokens Material 3 oficiales (Modo Claro y Modo Oscuro)
+│   │   ├── Theme.kt                  <- Configuración de DarkColorScheme y LightColorScheme semánticos
 │   │   └── Type.kt
 │   └── viewmodel/
 │       └── MindfulnessViewModel.kt   <- Esqueleto inicial de estado para la UI
