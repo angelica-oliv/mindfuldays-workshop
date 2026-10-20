@@ -38,9 +38,9 @@ Abra o painel do **Gemini** no Android Studio (**View → Tool Windows → Gemin
 You are an expert Android developer. Create a minimalist Android application named 'MindfulDays' with package name 'dev.mindfuldays.app' using Jetpack Compose and Material Design 3.
 
 FAST WORKSHOP EXECUTION RULES (CRITICAL FOR SPEED):
-- PLANNER & TASKS: Execute this setup in at most 2 coding tasks (Task 1: Theme, strings.xml & skeleton stubs; Task 2: 3 Compose screens & MainActivity navigation). Do NOT create separate asset/polish tasks.
+- PLANNER & TASKS: Limit the project plan to at most 3 concise tasks (Task 1: Theme, strings.xml & skeleton stubs; Task 2: 3 Compose screens & MainActivity navigation; Task 3: Fast critic_agent verification). Do NOT create a separate icon/asset polish task.
 - NO ICON GENERATION: Do NOT invoke app_icon_agent and do NOT modify or generate custom launcher icons (ic_launcher* or custom vector drawables).
-- NO EMULATOR / CRITIC LOOP: Do NOT deploy to an emulator or run critic_agent / automated adb UI inspection loops. Verify ONLY that './gradlew assembleDebug' compiles cleanly.
+- FAST CRITIC AGENT SMOKE TEST: When running critic_agent, perform a quick single-pass visual & crash check (launch app -> verify HomeScreen -> navigate to TimerScreen -> navigate to SettingsScreen in at most 3-4 interactions). Do NOT wait for timer countdowns or re-read all source files during QA.
 - MINIMAL DEPENDENCIES: Do NOT add unused libraries such as CameraX, Room, Play Services Location, Coil, or Accompanist.
 
 Use the attached Stitch UI screenshots as the exact visual reference and follow these prescriptive rules:
