@@ -37,9 +37,15 @@ Abra o painel do **Gemini** no Android Studio (**View → Tool Windows → Gemin
 ```text
 You are an expert Android developer. Create a minimalist Android application named 'MindfulDays' with package name 'dev.mindfuldays.app' using Jetpack Compose and Material Design 3.
 
+FAST WORKSHOP EXECUTION RULES (CRITICAL FOR SPEED):
+- PLANNER & TASKS: Execute this setup in at most 2 coding tasks (Task 1: Theme, strings.xml & skeleton stubs; Task 2: 3 Compose screens & MainActivity navigation). Do NOT create separate asset/polish tasks.
+- NO ICON GENERATION: Do NOT invoke app_icon_agent and do NOT modify or generate custom launcher icons (ic_launcher* or custom vector drawables).
+- NO EMULATOR / CRITIC LOOP: Do NOT deploy to an emulator or run critic_agent / automated adb UI inspection loops. Verify ONLY that './gradlew assembleDebug' compiles cleanly.
+- MINIMAL DEPENDENCIES: Do NOT add unused libraries such as CameraX, Room, Play Services Location, Coil, or Accompanist.
+
 Use the attached Stitch UI screenshots as the exact visual reference and follow these prescriptive rules:
 - UI STYLE & TYPOGRAPHY: Strict minimalist design for a workshop tutorial. Use Android system fonts ONLY (default sans-serif / Roboto). Use native Android Material 3 components ONLY (Button, OutlinedButton, FilledIconButton, OutlinedIconButton, ElevatedCard, Card, TopAppBar, Switch, HorizontalDivider). Do NOT create complex custom UI components.
-- INTERNATIONALIZATION (i18n): Never hardcode user-facing text strings in Composables. All labels, titles, descriptions, and button texts MUST be loaded using stringResource(R.string...) from resource files: 'res/values/strings.xml' (default / English), 'res/values-pt/strings.xml' (Portuguese), and 'res/values-es/strings.xml' (Spanish).
+- INTERNATIONALIZATION (i18n): Never hardcode user-facing text strings in Composables. Load all labels, titles, descriptions, and button texts using stringResource(R.string...) from 'res/values/strings.xml' ONLY. Do NOT create 'values-pt' or 'values-es' directories in this step (multi-locale files will be added in Module 3; creating them now triggers blocking MissingTranslation lint loops).
 - COLOR PALETTE & DUAL-THEME ADAPTATION (LIGHT & DARK MODE):
   * Strictly avoid hardcoded hex colors (e.g., Color(0xFF...)) in any Composable function! Always use semantic MaterialTheme.colorScheme tokens so the UI seamlessly adapts between Light and Dark themes without contrast issues:
     - Screen Backgrounds: MaterialTheme.colorScheme.background
