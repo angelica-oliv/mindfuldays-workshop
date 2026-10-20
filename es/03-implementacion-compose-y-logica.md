@@ -172,6 +172,19 @@ dependencies {
 }
 ```
 
+### 🤖 Prompt para Configurar `buildConfigField` y Dependencias con IA
+Si no tienes familiaridad con archivos Gradle (`build.gradle.kts` y `libs.versions.toml`), pide al asistente de Gemini en Android Studio que realice esta configuración automáticamente por ti:
+
+```text
+Siguiendo @AGENTS.md, configura el acceso seguro a GEMINI_API_KEY y las dependencias de red en Gradle:
+1. En `app/build.gradle.kts`:
+   - Lee la propiedad `GEMINI_API_KEY` desde el archivo `local.properties` en la raíz del proyecto usando `java.util.Properties` (con fallback a `""` si no existe).
+   - Dentro de `android.defaultConfig`, inyecta el campo `buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")`.
+   - Dentro de `android.buildFeatures`, habilita `buildConfig = true`.
+2. Verifica en `gradle/libs.versions.toml` y `app/build.gradle.kts` que estén declaradas y agregadas las dependencias de `retrofit`, `converter-moshi`, `moshi-kotlin`, `moshi-kotlin-codegen` (vía ksp), `okhttp` y `logging-interceptor`.
+3. Sincroniza el proyecto y verifica que compile sin errores.
+```
+
 ---
 
 ## 🌐 3.3. Internacionalización (i18n) con IA (Inglés, Español y Portugués)
