@@ -29,7 +29,7 @@ Al crear el proyecto, completa los parámetros fundamentales:
 
 ## 🤖 2.3. Prompt Multimodal para Gemini en Android Studio
 
-Abre el panel de **Gemini** en Android Studio (**View → Tool Windows → Gemini**) o utiliza la ventana **Create with AI**. Adjunta las capturas de pantalla generadas en **Stitch** y pega el siguiente prompt estructurado y prescriptivo:
+Abre el panel de **Gemini** en Android Studio (**View → Tool Windows → Gemini**) o utiliza la ventana **Create with AI**. Adjunta las capturas de pantalla generadas en **Stitch** (o utiliza directamente las imágenes en `screenshots/` del repositorio: `home_screen.png`, `timer_screen.png`, `settings_screen.png`) y pega el siguiente prompt estructurado y prescriptivo:
 
 > [!TIP]
 > **¿Por qué un prompt prescriptivo y con clases en esqueleto?** Al guiar a la IA especificando los componentes nativos exactos de Material 3, la tipografía estándar del sistema y las 3 pantallas sin elementos superfluos, el código generado en Android Studio tendrá fidelidad visual idéntica al diseño de Stitch. Además, al indicarle a la IA que genere clases como `GeminiApiService` y `AttitudeRepository` como esqueletos en blanco (*stubs* con TODOs), garantizamos que el proyecto compile de inmediato con pantallas funcionales, reservando la lógica de negocio y la integración de la API de Gemini para que los estudiantes las construyan paso a paso en los siguientes módulos. La clave de API de Gemini nunca debe exponerse en la interfaz de usuario (UI), leyéndose de forma segura a través de `local.properties` y `BuildConfig`.

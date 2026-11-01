@@ -101,4 +101,25 @@ Después de generar las pantallas en [Google Stitch](https://stitch.withgoogle.c
 
 ---
 
+## 📸 1.4. Capturas de Pantalla de Referencia (Placeholders / Screenshots)
+
+Si estás realizando el workshop en vivo y no tienes acceso a Stitch o prefieres ahorrar tiempo, puedes utilizar directamente estas capturas de pantalla pregeneradas disponibles en la carpeta [`screenshots/`](../screenshots/):
+
+### ☀️ Modo Claro (Light Mode — Referencia Oficial Stitch)
+| 01. Home Screen | 02. Timer Screen | 03. Settings Screen |
+| :---: | :---: | :---: |
+| <img src="../screenshots/home_screen.png" alt="Home Screen" width="220" /> | <img src="../screenshots/timer_screen.png" alt="Timer Screen" width="220" /> | <img src="../screenshots/settings_screen.png" alt="Settings Screen" width="220" /> |
+| `screenshots/home_screen.png` | `screenshots/timer_screen.png` | `screenshots/settings_screen.png` |
+
+### 🌙 Modo Oscuro (Dark Mode)
+| 01. Dark Home | 02. Dark Timer | 03. Dark Settings |
+| :---: | :---: | :---: |
+| <img src="../screenshots/dark_home.png" alt="Dark Home" width="220" /> | <img src="../screenshots/dark_timer.png" alt="Dark Timer" width="220" /> | <img src="../screenshots/dark_settings.png" alt="Dark Settings" width="220" /> |
+| `screenshots/dark_home.png` | `screenshots/dark_timer.png` | `screenshots/dark_settings.png` |
+
+> [!TIP]
+> **Para el Módulo 2:** Guarda o ten a mano los archivos `screenshots/home_screen.png`, `screenshots/timer_screen.png` y `screenshots/settings_screen.png` para adjuntarlos a Gemini en Android Studio cuando uses la opción multimodal.
+
+---
+
 ¡Listo! Con la interfaz prototipada en [Google Stitch](https://stitch.withgoogle.com/) y los tokens a mano, avanza al archivo **`02-setup-android-studio-ia.md`**.
