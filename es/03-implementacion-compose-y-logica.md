@@ -1,22 +1,22 @@
 # 🧩 Módulo 3 — AGENTS.md, Regla de las 9 Actitudes, Gemini API y UI en Compose
 
-En este módulo, estructuraremos el archivo **`AGENTS.md`** como contexto operacional para agentes de IA, configuraremos el acceso seguro a la **Gemini API** y nos enfocaremos únicamente en las **piezas clave de código y arquitectura**, delegando el código repetitivo (*boilerplate*) al asistente de IA mediante prompts guiados.
+En este módulo, estructuraremos el archivo **`AGENTS.md`** como contexto operacional y utilizaremos **un solo prompt unificado** para que Gemini en Android Studio configure las credenciales en Gradle, implemente la regla de las 9 actitudes, conecte la **Gemini API** con Retrofit/Moshi y prepare la UI para el workshop.
 
 ---
 
 ## 🤖 3.1. Directrices para Agentes de IA: Creación del Archivo `AGENTS.md`
 
-Antes de pedirle a la IA que implemente o refactorice archivos del proyecto, configuraremos nuestro recurso más estratégico: el archivo **`AGENTS.md`**.
+Antes de solicitar cualquier cambio a la IA, configuramos nuestro recurso más estratégico: el archivo **`AGENTS.md`**.
 
 ### 🌟 ¿Por qué es tan importante `AGENTS.md`?
 
-Así como el `README.md` orienta a las personas desarrolladoras, el **`AGENTS.md`** actúa como la **fuente única de verdad operacional para agentes autónomos y asistentes de código con IA** (como Gemini en Android Studio, Cursor, Claude Code, GitHub Copilot y Antigravity).
+Así como el `README.md` orienta a los desarrolladores, el **`AGENTS.md`** actúa como la **fuente única de verdad operacional para agentes y asistentes de código con IA** (Gemini en Android Studio, Cursor, Claude Code, GitHub Copilot y Antigravity):
 
 1. **Grounding y Reducción de Alucinaciones**: Ancla a la IA en las decisiones técnicas ya tomadas.
 2. **Consistencia de Stack y Arquitectura**: Garantiza el respeto estricto por **MVVM**, **Clean Architecture**, **Kotlin idiomático** y **Jetpack Compose con Material Design 3**.
-3. **Fidelidad a los Design Tokens y Reglas de Negocio**: Mantiene siempre presentes la paleta oficial extraída en Stitch y la rotación cíclica de las 9 actitudes de Jon Kabat-Zinn.
+3. **Fidelidad a los Design Tokens y Reglas de Negocio**: Mantiene presente la paleta oficial de Stitch y la rotación cíclica de las 9 actitudes de Jon Kabat-Zinn.
 4. **Guardrails de Seguridad**: Prohíbe explícitamente claves secretas (`apiKey`) hardcodeadas o colores hexadecimales fijos en Composables.
-5. **Prompts más cortos y rápidos en el Workshop**: Con `AGENTS.md` en la raíz del proyecto, no necesitas repetir reglas arquitectónicas ni paletas de colores en cada prompt.
+5. **Máxima Velocidad en Presentaciones y Workshops**: Al existir `AGENTS.md` en la raíz, un **único prompt** es suficiente para implementar toda la lógica de negocio y red.
 
 ---
 
@@ -91,319 +91,98 @@ Verifica siempre los cambios utilizando los siguientes comandos en la terminal:
 
 ---
 
-## 🔑 3.2. Configuración de Gemini API y Gestión Segura de Credenciales
+## 🔑 3.2. Clave de API en `local.properties` (Paso Manual Rápido)
 
-Para integrar la **Gemini API** de forma segura y moderna, configuraremos la clave en `local.properties` y las dependencias de **Retrofit**, **Moshi** y **OkHttp**.
-
-### 1. Obtención y Activación de la API Key
-1. Ingresa a [Google AI Studio](https://aistudio.google.com/), haz clic en **Get API key** y copia la clave generada.
-2. Asegúrate de tener habilitada la **Generative Language API** en tu consola de Google Cloud (`https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview`).
-
-> [!WARNING]
-> **Trampa Común — Claves de Firebase (`API_KEY_SERVICE_BLOCKED` 403):**
-> Nunca utilices claves generadas automáticamente por Firebase para llamar al endpoint de Gemini API. Utiliza siempre una clave creada directamente en **Google AI Studio**.
-
-### 2. Almacenamiento Seguro en `local.properties`
-Abre el archivo `local.properties` en la raíz del proyecto (ignorado por Git) y agrega:
+1. Obtén tu API Key gratuita en [Google AI Studio](https://aistudio.google.com/) (**Get API key**).
+2. Abre el archivo `local.properties` en la raíz de tu proyecto (ignorado por Git) y agrega tu clave:
 
 ```properties
 GEMINI_API_KEY=tu_clave_de_ai_studio_aqui
 ```
 
-### 3. Inyección vía `buildConfigField` en `app/build.gradle.kts`
-En el archivo `app/build.gradle.kts`, lee `local.properties` y expón la constante en `BuildConfig`:
+> [!WARNING]
+> **Importante:** Utiliza una clave generada en Google AI Studio (o Google Cloud con la Generative Language API habilitada). No utilices claves de Firebase con restricciones de app, ya que generan error `403 (API_KEY_SERVICE_BLOCKED)`.
 
-```kotlin
-import java.util.Properties
+---
 
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.inputStream().use { localProperties.load(it) }
-}
-val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY") ?: ""
+## 🔍 3.3. Conceptos Clave de Arquitectura (Lo que la IA construirá)
 
-android {
-    // ...
-    defaultConfig {
-        // ...
-        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
-    }
+Para entender lo que la IA implementará en el prompt unificado:
 
-    buildFeatures {
-        compose = true
-        buildConfig = true // Habilita la generación de BuildConfig
-    }
-}
-```
+1. **Gradle & Inyección Segura**: `app/build.gradle.kts` lee `local.properties` y expone `BuildConfig.GEMINI_API_KEY`, agregando Retrofit, Moshi y OkHttp.
+2. **Internacionalización (i18n)**: Generación sincronizada de `values/strings.xml`, `values-es/strings.xml` y `values-pt/strings.xml` con las 9 actitudes de Jon Kabat-Zinn.
+3. **Fórmula de Rotación Cíclica**:
+   ```kotlin
+   fun getTodayAttitude(dayOfYear: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)): MindfulnessAttitude {
+       val index = (dayOfYear - 1).mod(attitudes.size)
+       return attitudes[index]
+   }
+   ```
+4. **Cliente Gemini API**: Llamada REST a `v1beta/models/gemini-3.8-flash:generateContent` con adaptadores Moshi en Kotlin y fallback amigable offline si no hay red o falta la clave.
 
-### 4. Dependencias de Red (`libs.versions.toml` y `app/build.gradle.kts`)
-Agrega Retrofit, Moshi y OkHttp en `gradle/libs.versions.toml`:
+---
 
-```toml
-[versions]
-retrofit = "3.0.0"
-converterMoshi = "3.0.0"
-okhttp = "5.3.2"
-loggingInterceptor = "5.3.2"
-moshiKotlin = "1.15.2"
-moshiKotlinCodegen = "1.15.2"
+## ⚡ 3.4. Prompt Único y Completo para Gemini en Android Studio (Todo en Uno)
 
-[libraries]
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "converterMoshi" }
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
-moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiKotlin" }
-moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
-```
-
-Y decláralas en el bloque `dependencies` de `app/build.gradle.kts`:
-
-```kotlin
-dependencies {
-    // Networking y Gemini API
-    implementation(libs.retrofit)
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-    "ksp"(libs.moshi.kotlin.codegen)
-}
-```
-
-### 🤖 Prompt para Configurar `buildConfigField` y Dependencias con IA
-Si no tienes familiaridad con archivos Gradle (`build.gradle.kts` y `libs.versions.toml`), pide al asistente de Gemini en Android Studio que realice esta configuración automáticamente por ti:
+Abre el panel de **Gemini** en Android Studio (**View → Tool Windows → Gemini**) y envía el siguiente **prompt unificado**. Realizará todas las tareas del Módulo 3 en un solo paso:
 
 ```text
-Siguiendo @AGENTS.md, configura el acceso seguro a GEMINI_API_KEY y las dependencias de red en Gradle:
-1. En `app/build.gradle.kts`:
-   - Lee la propiedad `GEMINI_API_KEY` desde el archivo `local.properties` en la raíz del proyecto usando `java.util.Properties` (con fallback a `""` si no existe).
-   - Dentro de `android.defaultConfig`, inyecta el campo `buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")`.
-   - Dentro de `android.buildFeatures`, habilita `buildConfig = true`.
-2. Verifica en `gradle/libs.versions.toml` y `app/build.gradle.kts` que estén declaradas y agregadas las dependencias de `retrofit`, `converter-moshi`, `moshi-kotlin`, `moshi-kotlin-codegen` (vía ksp), `okhttp` y `logging-interceptor`.
-3. Sincroniza el proyecto y verifica que compile sin errores.
+Actúa como un Desarrollador Android Senior y sigue estrictamente las directrices de @AGENTS.md.
+Realiza en un solo paso todas las configuraciones e implementaciones pendientes del Módulo 3 para 'dev.mindfuldays.app':
+
+1. CONFIGURACIÓN DE GRADLE Y SEGURIDAD:
+   - En `app/build.gradle.kts`:
+     * Carga `local.properties` mediante `java.util.Properties` y lee la propiedad `GEMINI_API_KEY` (fallback a "").
+     * En `defaultConfig`, agrega: `buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")`.
+     * En `buildFeatures`, asegura `compose = true` y `buildConfig = true`.
+   - En `gradle/libs.versions.toml` y `app/build.gradle.kts`, asegura las dependencias para:
+     * Retrofit (`retrofit`, `converter-moshi`)
+     * Moshi (`moshi-kotlin`, KSP `moshi-kotlin-codegen`)
+     * OkHttp (`okhttp`, `logging-interceptor`)
+
+2. RECURSOS DE STRINGS E INTERNACIONALIZACIÓN (i18n):
+   - Crea/actualiza de forma consistente:
+     * `app/src/main/res/values/strings.xml` (Inglés por defecto)
+     * `app/src/main/res/values-es/strings.xml` (Español)
+     * `app/src/main/res/values-pt/strings.xml` (Portugués)
+   - Incluye las claves: `app_name`, `app_title`, `attitude_counter` ("Attitude %1$d of %2$d"), `default_reflection`, `btn_new_reflection`, `btn_start_timer`, `timer_title`, `timer_subtitle`, `timer_session_guided`, `timer_status_completed`, `timer_status_running`, `timer_status_paused`, `settings_title`, `settings_section_reminders`, `settings_daily_reminder`, `settings_meditate_reminder`, `settings_section_about`, `settings_version_info`, content descriptions (`cd_settings`, `cd_back`, `cd_reset`, `cd_play`, `cd_pause`), y las 9 Actitudes de Mindfulness de Jon Kabat-Zinn (`attitude_1_name` a `attitude_9_name` y `attitude_1_desc` a `attitude_9_desc`).
+
+3. LÓGICA DE NEGOCIO Y REPOSITORIO (AttitudeRepository.kt):
+   - En `dev/mindfuldays/app/data/repository/AttitudeRepository.kt`:
+     * Implementa la lista inmutable pública `val attitudes = listOf(...)` con las 9 actitudes (IDs 1 al 9), con sus nombres, descripciones y referencias a recursos `@StringRes` (`nameRes`, `descriptionRes`).
+     * Implementa `fun getTodayAttitude(dayOfYear: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)): MindfulnessAttitude` usando la fórmula `(dayOfYear - 1).mod(attitudes.size)`.
+
+4. INTEGRACIÓN CON GEMINI API (GeminiApiService.kt):
+   - En `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
+     * Define los DTOs con `@JsonClass(generateAdapter = true)`: `GeminiRequest`, `Content`, `Part`, `GeminiResponse`, `Candidate`, `ContentResponse`, `PartResponse`.
+     * Interfaz Retrofit `GeminiApi` con `@POST("v1beta/models/gemini-3.8-flash:generateContent")` recibiendo `@Query("key") apiKey: String` y `@Body request: GeminiRequest`.
+     * Configura `Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()` y el cliente Retrofit con `HttpLoggingInterceptor`.
+     * Implementa `suspend fun generateReflection(attitudeTitle: String, languageCode: String = Locale.getDefault().language): String` en `Dispatchers.IO`:
+       - Lee `BuildConfig.GEMINI_API_KEY`. Si está vacía (`isBlank()`), retorna un mensaje amigable offline en el idioma del usuario.
+       - Construye el prompt para solicitar una reflexión de mindfulness de máximo 2 oraciones en texto plano en el idioma correspondiente (`languageCode`).
+       - En caso de excepción de red (re-lanzando `CancellationException`), registra el error y retorna el fallback offline sin fallar ni romper la app.
+
+5. VIEWMODEL Y ESTADO DE UI (MindfulnessViewModel.kt):
+   - En `dev/mindfuldays/app/ui/viewmodel/MindfulnessViewModel.kt`:
+     * Define `MindfulnessUiState(val attitude: MindfulnessAttitude, val aiReflection: String = "", val isLoadingAi: Boolean = false)`.
+     * Conecta `AttitudeRepository` y `GeminiApiService`.
+     * Expón `val uiState: StateFlow<MindfulnessUiState>` inicializado con `repository.getTodayAttitude()`.
+     * Implementa `fun generateAiReflection(attitudeTitle: String? = null, languageCode: String = Locale.getDefault().language)` actualizando `isLoadingAi = true`, llamando a `geminiService.generateReflection` y actualizando el estado.
+
+6. AUDITORÍA DE UI Y TEMA:
+   - Revisa `HomeScreen.kt` y `Theme.kt`: asegúrate de que no haya colores hex hardcodeados (usar `MaterialTheme.colorScheme.*`), todos los textos usen `stringResource(R.string.*)` y `HomeScreen` delegue a un composable stateless `HomeScreenContent` desacoplado para facilitar pruebas.
+
+Sincroniza el proyecto y verifica que './gradlew assembleDebug' compile exitosamente.
 ```
 
 ---
 
-## 🌐 3.3. Internacionalización (i18n) con IA (Inglés, Español y Portugués)
+## ✅ 3.5. Verificación de Compilación
 
-En lugar de copiar y pegar cientos de líneas de archivos XML manualmente, utilizaremos a Gemini para generar o verificar las tablas de recursos en los 3 idiomas (`values/strings.xml`, `values-es/strings.xml` y `values-pt/strings.xml`).
-
-### 🔍 Estructura Clave de `strings.xml`
-Asegúrate de que tus archivos de recursos sigan estos nombres de claves estándar (necesarios para la UI y las pruebas del Módulo 4):
-
-```xml
-<resources>
-    <string name="app_name">MindfulDays</string>
-    <string name="app_title">MINDFULDAYS</string>
-    <string name="attitude_counter">Actitud %1$d de %2$d</string>
-    <string name="default_reflection">“Respira profundo y trae tu atención al momento presente.”</string>
-    <string name="btn_new_reflection">✨ Nueva Reflexión (Gemini IA)</string>
-    <string name="btn_start_timer">⏱️ Iniciar Temporizador de Meditación</string>
-    <string name="cd_settings">Configuración</string>
-    <!-- Las 9 Actitudes: attitude_1_name / attitude_1_desc hasta attitude_9_name / attitude_9_desc -->
-    <string name="attitude_1_name">Mente de Principiante</string>
-    <string name="attitude_1_desc">Mira las cosas como si fuera la primera vez, libre de expectativas.</string>
-</resources>
-```
-
-### 🤖 Prompt para Generar los Archivos `strings.xml` (EN / ES / PT)
-Abre el chat de Gemini en Android Studio y ejecuta este prompt:
-
-```text
-Siguiendo las directrices de @AGENTS.md, genera o completa los 3 archivos de recursos de strings para internacionalización:
-1. app/src/main/res/values/strings.xml (Inglés por defecto)
-2. app/src/main/res/values-es/strings.xml (Español)
-3. app/src/main/res/values-pt/strings.xml (Portugués)
-
-Incluye exactamente estas claves en los 3 idiomas:
-- Generales y Home: app_name, app_title, attitude_counter ("Attitude %1$d of %2$d"), default_reflection, btn_new_reflection, btn_start_timer.
-- Temporizador: timer_title, timer_subtitle, timer_session_guided, timer_status_completed, timer_status_running, timer_status_paused.
-- Configuración: settings_title, settings_section_reminders, settings_daily_reminder, settings_meditate_reminder, settings_section_about, settings_version_info.
-- Accesibilidad: cd_settings, cd_back, cd_reset, cd_play, cd_pause.
-- Las 9 Actitudes de Mindfulness de Jon Kabat-Zinn (attitude_1_name a attitude_9_name y attitude_1_desc a attitude_9_desc):
-  1. Mente de Principiante (Beginner's Mind)
-  2. No Juicio (Non-Judging)
-  3. Aceptación (Acceptance)
-  4. Desapego (Letting Go)
-  5. Confianza (Trust)
-  6. No Esforzarse (Non-Striving)
-  7. Paciencia (Patience)
-  8. Gratitud (Gratitude)
-  9. Generosidad (Generosity)
-```
-
----
-
-## 🧠 3.4. Regla de las 9 Actitudes y Estado de la UI (`AttitudeRepository` y `MindfulnessViewModel`)
-
-En el Módulo 2 generamos `AttitudeRepository.kt` y `MindfulnessViewModel.kt` como esqueletos (*stubs*). Ahora implementaremos la lógica real.
-
-### 🔍 Código Clave a Enfocar: Fórmula de Rotación Cíclica
-El corazón del dominio de **MindfulDays** es el modelo `MindfulnessAttitude` y la función determinística `getTodayAttitude`, que rota las 9 actitudes según el día del año usando la operación módulo (`.mod(9)`):
-
-```kotlin
-// data/model/MindfulnessAttitude.kt
-data class MindfulnessAttitude(
-    val id: Int,
-    val name: String = "",
-    val description: String = "",
-    @get:StringRes val nameRes: Int = 0,
-    @get:StringRes val descriptionRes: Int = 0
-)
-
-// Lógica central en data/repository/AttitudeRepository.kt
-fun getTodayAttitude(dayOfYear: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)): MindfulnessAttitude {
-    val index = (dayOfYear - 1).mod(attitudes.size)
-    return attitudes[index]
-}
-```
-
-> [!TIP]
-> **¿Por qué pasar `dayOfYear` como parámetro con valor por defecto?**
-> Esto permite que en producción tome automáticamente el día actual del calendario, mientras que en las **Pruebas Unitarias (Módulo 4)** podemos inyectar cualquier día (día 1, día 9, día 10, día 365) para probar la rotación sin depender del reloj del sistema.
-
-### 🤖 Prompt para Implementar `AttitudeRepository.kt` y `MindfulnessViewModel.kt`
-En lugar de escribir manualmente la lista de las 9 actitudes y el `StateFlow` del ViewModel, pídele a Gemini:
-
-```text
-Siguiendo @AGENTS.md, completa la implementación de estas dos clases reemplazando los TODOs:
-
-1. En `dev/mindfuldays/app/data/repository/AttitudeRepository.kt`:
-   - Define la propiedad pública `val attitudes = listOf(...)` con las 9 Actitudes de Mindfulness de Jon Kabat-Zinn (IDs del 1 al 9), incluyendo sus textos por defecto (`name`, `description`) y sus referencias `@StringRes` (`R.string.attitude_1_name`, `R.string.attitude_1_desc`, etc.).
-   - Implementa `fun getTodayAttitude(dayOfYear: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)): MindfulnessAttitude` usando `val index = (dayOfYear - 1).mod(attitudes.size)`.
-
-2. En `dev/mindfuldays/app/ui/viewmodel/MindfulnessViewModel.kt`:
-   - Mantén `data class MindfulnessUiState(val attitude: MindfulnessAttitude, val aiReflection: String = "", val isLoadingAi: Boolean = false)`.
-   - En `MindfulnessViewModel(private val repository: AttitudeRepository = AttitudeRepository(), private val geminiService: GeminiApiService = GeminiApiService())`, expón `val uiState: StateFlow<MindfulnessUiState>` inicializado con `repository.getTodayAttitude()`.
-   - Implementa `fun generateAiReflection(attitudeTitle: String? = null, languageCode: String = Locale.getDefault().language)` que actualice `isLoadingAi = true`, llame a `geminiService.generateReflection(title, languageCode)` y actualice `aiReflection` e `isLoadingAi = false`.
-```
-
----
-
-## 🤖 3.5. Integración con Gemini API vía Retrofit y Moshi (`GeminiApiService.kt`)
-
-Ahora conectaremos nuestra aplicación con el modelo **`gemini-3.8-flash`** utilizando Retrofit y Moshi.
-
-> [!IMPORTANT]
-> **Dos Puntos Críticos en Producción:**
-> 1. **Modelo (`gemini-3.8-flash`)**: Modelos anteriores como `gemini-1.5-flash` o `gemini-2.5-flash` devuelven HTTP 404 para nuevas claves en `v1beta`. Usa siempre **`gemini-3.8-flash`**.
-> 2. **Serialización con Moshi en Kotlin**: Anota los DTOs con `@JsonClass(generateAdapter = true)` y registra `KotlinJsonAdapterFactory()` en el builder de Moshi para evitar fallos de reflexión en tiempo de ejecución.
-
-### 🔍 Código Clave a Enfocar: Contrato Retrofit y Configuración Moshi
-Estos son los dos bloques esenciales que estructuran la llamada a la API:
-
-```kotlin
-// 1. DTOs y Endpoint oficial en data/remote/GeminiApiService.kt
-@JsonClass(generateAdapter = true)
-data class GeminiRequest(val contents: List<Content>)
-
-@JsonClass(generateAdapter = true)
-data class Content(val parts: List<Part>)
-
-@JsonClass(generateAdapter = true)
-data class Part(val text: String)
-
-@JsonClass(generateAdapter = true)
-data class GeminiResponse(val candidates: List<Candidate>?)
-
-@JsonClass(generateAdapter = true)
-data class Candidate(val content: ContentResponse?)
-
-@JsonClass(generateAdapter = true)
-data class ContentResponse(val parts: List<PartResponse>?)
-
-@JsonClass(generateAdapter = true)
-data class PartResponse(val text: String?)
-
-interface GeminiApi {
-    @POST("v1beta/models/gemini-3.8-flash:generateContent")
-    suspend fun generateContent(
-        @Query("key") apiKey: String,
-        @Body request: GeminiRequest
-    ): GeminiResponse
-}
-
-// 2. Builder de Moshi + Retrofit
-val moshi = Moshi.Builder()
-    .addLast(KotlinJsonAdapterFactory())
-    .build()
-```
-
-### 🤖 Prompt para Generar `GeminiApiService.kt` Completo
-Usa este prompt en el asistente de IA para generar toda la clase `GeminiApiService.kt` con soporte multilingüe y modo offline:
-
-```text
-Siguiendo @AGENTS.md, implementa la clase completa `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
-1. Incluye los DTOs (`GeminiRequest`, `Content`, `Part`, `GeminiResponse`, `Candidate`, `ContentResponse`, `PartResponse`) anotados con `@JsonClass(generateAdapter = true)` y la interfaz `GeminiApi` con `@POST("v1beta/models/gemini-3.8-flash:generateContent")`.
-2. Configura `OkHttpClient` con `HttpLoggingInterceptor(Level.BODY)`, `Moshi` con `KotlinJsonAdapterFactory()` y `Retrofit` apuntando a `"https://generativelanguage.googleapis.com/"`.
-3. Implementa `suspend fun generateReflection(attitudeTitle: String, languageCode: String = Locale.getDefault().language): String` ejecutándose en `Dispatchers.IO`:
-   - Lee `BuildConfig.GEMINI_API_KEY`. Si está vacía (`isBlank()`), retorna inmediatamente un mensaje amigable de fallback offline según `languageCode` ("es", "en", "pt").
-   - Construye un prompt sereno de mindfulness pidiendo una reflexión inspiradora de máximo 2 oraciones en texto plano sobre `attitudeTitle`, estrictamente en el idioma `languageCode`.
-   - Captura cualquier excepción de red (re-lanzando `CancellationException`), registra el error en `Log.e` y retorna el fallback offline sin romper la app.
-```
-
----
-
-## 🎨 3.6. Tema Dual (Light/Dark Mode) y `HomeScreen.kt` Desacoplada
-
-En el Módulo 2 generamos los archivos `Color.kt`, `Theme.kt` y `HomeScreen.kt`. Antes de pasar a las pruebas automatizadas del Módulo 4, revisaremos dos conceptos clave de UI en Jetpack Compose.
-
-> [!CAUTION]
-> **El Peligro de Hardcodear Colores en Composables:**
-> Si defines colores fijos como `Color(0xFFFFFFFF)` directamente en un Composable, en **Modo Oscuro** el texto (`onSurface`, blanco cálido) quedará invisible sobre el fondo blanco. Usa siempre tokens semánticos: `MaterialTheme.colorScheme.background`, `surface`, `onSurface`, `onSurfaceVariant`, `primary` y `outlineVariant`.
-
-### 🔍 Código Clave a Enfocar: Separación de Estado (`HomeScreen` vs `HomeScreenContent`)
-Para que nuestras pruebas de UI con **Robot Pattern** (Módulo 4) sean rápidas y determinísticas, separamos `HomeScreen` en una función con estado (conectada al ViewModel) y una función *stateless* (`HomeScreenContent`) que recibe solo datos primitivos y lambdas:
-
-```kotlin
-@Composable
-fun HomeScreen(
-    viewModel: MindfulnessViewModel,
-    onNavigateToSettings: () -> Unit,
-    onNavigateToTimer: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val localizedAttitudeName = if (uiState.attitude.nameRes != 0) {
-        stringResource(uiState.attitude.nameRes)
-    } else {
-        uiState.attitude.name
-    }
-
-    HomeScreenContent(
-        attitude = uiState.attitude,
-        aiReflection = uiState.aiReflection,
-        isLoadingAi = uiState.isLoadingAi,
-        onGenerateAiReflection = {
-            viewModel.generateAiReflection(attitudeTitle = localizedAttitudeName)
-        },
-        onNavigateToSettings = onNavigateToSettings,
-        onNavigateToTimer = onNavigateToTimer,
-        modifier = modifier
-    )
-}
-```
-
-### 🤖 Prompt de Auditoría para `Theme.kt` y `HomeScreen.kt`
-Si deseas verificar o ajustar tu tema y pantalla principal generados en el Módulo 2, ejecuta este prompt:
-
-```text
-Revisa `Color.kt`, `Theme.kt` y `HomeScreen.kt` contra las reglas de @AGENTS.md:
-1. Verifica que `Theme.kt` defina correctamente `LightColorScheme` y `DarkColorScheme` usando la paleta oficial de MindfulDays y `dynamicColor: Boolean = false` por defecto.
-2. Verifica que `HomeScreen.kt` NO tenga ningún `Color(0xFF...)` ni textos hardcodeados: todos los colores deben usar `MaterialTheme.colorScheme.*` y todos los textos deben usar `stringResource(R.string.*)`.
-3. Asegúrate de que `HomeScreen.kt` exponga el composable stateless `HomeScreenContent(attitude: MindfulnessAttitude, aiReflection: String, isLoadingAi: Boolean, onGenerateAiReflection: () -> Unit, onNavigateToSettings: () -> Unit, onNavigateToTimer: () -> Unit, modifier: Modifier = Modifier)` para nuestras pruebas de UI.
-```
-
----
-
-### ✅ Verificación Rápida del Módulo 3
-En la terminal de Android Studio, verifica que todo compile correctamente antes de iniciar las pruebas:
+En la terminal de Android Studio, ejecuta:
 
 ```bash
 ./gradlew assembleDebug
 ```
 
-Con el contexto en `AGENTS.md`, la lógica de las 9 actitudes y la integración con Gemini API listas en una fracción del tiempo, avanzamos hacia el **Módulo 4: Calidad de Software, Pruebas Automatizadas con IA y Robot Pattern**.
+Con este **único prompt**, completamos toda la integración de red, persistencia, i18n y estado de negocio en minutos. ¡Avanzamos hacia el **Módulo 4: Calidad de Software, Pruebas Automatizadas con IA y Robot Pattern**!
