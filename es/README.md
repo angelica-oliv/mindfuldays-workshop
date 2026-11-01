@@ -46,7 +46,6 @@ Antes de iniciar los módulos prácticos, asegúrate de contar con los siguiente
 
 Sigue los archivos `.md` en la secuencia propuesta para completar el workshop:
 
-0. [**`PRESENTACION.md`**](./PRESENTACION.md) — *📽️ Guía de Presentación de 1 Hora (Cronograma de 60 minutos, Notas de la Oradora y Pacing)*
 1. [**`01-diseno-ui-stitch.md`**](./01-diseno-ui-stitch.md) — *Paso 1: Prototipado Visual, Sitemap y Design System en Google Stitch (Modo Claro y Oscuro)*
 2. [**`02-setup-android-studio-ia.md`**](./02-setup-android-studio-ia.md) — *Paso 2: Configuración de Android Studio Estable e Inicialización con Create with AI*
 3. [**`03-implementacion-compose-y-logica.md`**](./03-implementacion-compose-y-logica.md) — *Paso 3: Directrices con AGENTS.md, Interfaz en Jetpack Compose, Soporte Dual-Theme, 9 Actitudes y Gemini API (Prompt Único)*

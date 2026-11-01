@@ -28,7 +28,6 @@
 
 | # | 🇵🇪 🇪🇸 Español | 🇧🇷 Português |
 | :---: | :--- | :--- |
-| **📽️** | [Guía de Presentación (1 Hora)](./es/PRESENTACION.md) | [Guia de Apresentação (1 Hora)](./pt/APRESENTACAO.md) |
 | **01** | [Módulo 1: Diseño UI y Stitch](./es/01-diseno-ui-stitch.md) | [Módulo 1: Design UI e Stitch](./pt/01-design-ui-stitch.md) |
 | **02** | [Módulo 2: Setup Android Studio con IA](./es/02-setup-android-studio-ia.md) | [Módulo 2: Setup Android Studio com IA](./pt/02-setup-android-studio-ai.md) |
 | **03** | [Módulo 3: AGENTS.md, Compose y Gemini API](./es/03-implementacion-compose-y-logica.md) | [Módulo 3: AGENTS.md, Compose e Gemini API](./pt/03-implementacao-compose-e-logica.md) |
