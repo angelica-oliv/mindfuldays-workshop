@@ -71,7 +71,8 @@ Respeite estritamente os tokens de cores semânticos do Material 3, garantindo s
 1. **Regra das 9 Atitudes**: A lista contém exatamente 9 atitudes fixas. O cálculo da atitude diária deve usar o dia do ano:
    `val index = (dayOfYear - 1).mod(attitudes.size)`
 2. **Gemini API (Reflexões Diárias)**:
-   - Utilizar o endpoint do modelo `gemini-3.8-flash:generateContent`.
+   - Utilizar o endpoint do modelo `gemini-2.5-flash:generateContent` (ou `gemini-3.8-flash:generateContent`).
+   - Configurar OkHttpClient com timeouts adequados para LLM (`connectTimeout`: 30s, `readTimeout`: 60s, `writeTimeout`: 30s). Não fixar `callTimeout` agressivos nem `pingInterval` para evitar erros de SocketTimeoutException.
    - Gerar reflexões concisas e inspiradoras com no máximo 2 frases para cada atitude, respeitando o idioma do usuário (pt, en, es).
    - Tratar ausência de chave de API e erros de rede com fallback amigável offline sem quebrar o app.
 
@@ -155,12 +156,19 @@ Realize em um único passo todas as configurações e implementações pendentes
 4. INTEGRAÇÃO COM GEMINI API (GeminiApiService.kt):
    - Em `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
      * Defina os DTOs com `@JsonClass(generateAdapter = true)`: `GeminiRequest`, `Content`, `Part`, `GeminiResponse`, `Candidate`, `ContentResponse`, `PartResponse`.
-     * Interface Retrofit `GeminiApi` com `@POST("v1beta/models/gemini-3.8-flash:generateContent")` recebendo `@Query("key") apiKey: String` e `@Body request: GeminiRequest`.
-     * Configure `Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()` e o cliente Retrofit com `HttpLoggingInterceptor`.
+     * Interface Retrofit `GeminiApi` com `@POST("v1beta/models/gemini-2.5-flash:generateContent")` (ou `gemini-3.8-flash:generateContent`) recebendo `@Query("key") apiKey: String` e `@Body request: GeminiRequest`.
+     * Configure `OkHttpClient.Builder()` otimizado para LLMs com timeouts adequados:
+       - `.connectTimeout(30, TimeUnit.SECONDS)`
+       - `.readTimeout(60, TimeUnit.SECONDS)`
+       - `.writeTimeout(30, TimeUnit.SECONDS)`
+       - `.retryOnConnectionFailure(true)`
+       - `.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })`
+       - REGRA CRÍTICA DE TIMEOUT: NÃO use `callTimeout(20s)` nem `pingInterval` (provocam cancelamentos prematuros e SocketTimeoutException durante a inferência do Gemini).
+     * Configure `Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()` e o cliente Retrofit com este `OkHttpClient`.
      * Implemente `suspend fun generateReflection(attitudeTitle: String, languageCode: String = Locale.getDefault().language): String` em `Dispatchers.IO`:
        - Leia `BuildConfig.GEMINI_API_KEY`. Se estiver vazia (`isBlank()`), retorne uma mensagem amigável offline no idioma do usuário.
        - Construa o prompt solicitando uma reflexão serena de mindfulness de no máximo 2 frases em texto simples no idioma correspondente (`languageCode`).
-       - Em caso de exceção de rede (relançando `CancellationException`), registre o erro e retorne o fallback offline sem quebrar o app.
+       - Em caso de exceção de rede ou timeout (relançando `CancellationException`), registre o erro e retorne o fallback offline sem quebrar o app.
 
 5. VIEWMODEL E ESTADO DE UI (MindfulnessViewModel.kt):
    - Em `dev/mindfuldays/app/ui/viewmodel/MindfulnessViewModel.kt`:
