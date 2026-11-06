@@ -9,9 +9,9 @@ Neste segundo módulo, vamos configurar o projeto do aplicativo **MindfulDays** 
 1. Certifique-se de que está utilizando a versão **Stable** mais recente do Android Studio.
 2. Abra o Android Studio e acesse **Settings/Preferences → Tools → AI Assistant (Gemini)**.
 3. Faça login com sua conta Google e certifique-se de que o assistente **Gemini** está ativado.
-4. Para utilizar o gerador de projetos **Create with AI** ou o painel de assistente do Gemini:
+4. Para inicializar o projeto com o **Create with AI**:
    * Acesse **New Project** na tela inicial do Android Studio.
-   * Selecione o template **Empty Activity** (ou selecione a opção **Create with AI...** se disponível na barra lateral de templates).
+   * Selecione a opção **Create with AI...** na barra lateral de templates de projeto.
 
 ---
 

@@ -9,9 +9,9 @@ En este segundo módulo, configuraremos el proyecto de la aplicación **MindfulD
 1. Asegúrate de estar utilizando la versión **Estable** más reciente de Android Studio.
 2. Abre Android Studio y ve a **Settings/Preferences → Tools → AI Assistant (Gemini)**.
 3. Inicia sesión con tu cuenta de Google y asegúrate de que el asistente **Gemini** esté activado.
-4. Para utilizar el generador de proyectos **Create with AI** o el panel del asistente de Gemini:
+4. Para inicializar el proyecto con **Create with AI**:
    * Ve a **New Project** en la pantalla de inicio de Android Studio.
-   * Selecciona la plantilla **Empty Activity** (o selecciona la opción **Create with AI...** si está disponible en la barra lateral de plantillas).
+   * Selecciona la opción **Create with AI...** en la barra lateral de plantillas de proyecto.
 
 ---
 
