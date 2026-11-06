@@ -32,7 +32,11 @@ Ao criar o projeto, preencha os parâmetros fundamentais:
 Abra o painel do **Gemini** no Android Studio (**View → Tool Windows → Gemini**) ou utilize a janela **Create with AI**. Anexe as capturas de tela geradas no **Stitch** (ou utilize diretamente as imagens em `screenshots/` do repositório: `home_screen.png`, `timer_screen.png`, `settings_screen.png`) e cole o seguinte prompt estruturado e prescritivo:
 
 > [!TIP]
-> **Por que um prompt prescritivo e com classes em esqueleto?** Ao guiar a IA especificando os componentes nativos exatos do Material 3, a tipografia padrão do sistema e as 3 telas sem elementos supérfluos, o código gerado no Android Studio terá fidelidade visual idêntica ao design do Stitch. Além disso, ao instruir a IA a gerar classes como `GeminiApiService` e `AttitudeRepository` como esqueletos em branco (*stubs* com TODOs), garantimos que o projeto compile imediatamente com telas funcionais, reservando a lógica de negócio e integração da API Gemini para serem construídas passo a passo pelos alunos nos módulos seguintes. A chave da API do Gemini nunca deve ser exposta na interface do usuário (UI), sendo lida com segurança via `local.properties` e `BuildConfig`.
+> **Por que um prompt prescritivo e com classes em esqueleto?**
+> * **Fidelidade visual idêntica:** Especificar componentes Material 3, tipografia do sistema e apenas as 3 telas garante que o código replique fielmente o design do Stitch sem elementos supérfluos.
+> * **Compilação imediata:** Pedir classes esqueleto (*stubs* com TODOs como `GeminiApiService` e `AttitudeRepository`) garante que o projeto compile e navegue desde o primeiro minuto.
+> * **Aprendizado progressivo:** Reserva a lógica de negócio e a integração do Gemini para que os alunos as construam passo a passo nos módulos seguintes.
+> * **Segurança:** A chave da API do Gemini nunca é exposta na UI, sendo protegida de forma segura via `local.properties` e `BuildConfig`.
 
 ```text
 You are an expert Android developer. Create a minimalist Android application named 'MindfulDays' with package name 'dev.mindfuldays.app' using Jetpack Compose and Material Design 3.
