@@ -82,26 +82,7 @@ REQUIRED SCREENS & EXACT ELEMENTS:
 
 ---
 
-## 🎨 1.3. Extracción de Assets y Tokens (Material Design 3)
-
-Después de generar las pantallas en [Google Stitch](https://stitch.withgoogle.com/):
-1. Captura capturas de pantalla (screenshots) en alta resolución de las 3 pantallas generadas (usarás estas imágenes en el Módulo 2 dentro de Android Studio).
-2. Anota los tokens de colores para la configuración en **Jetpack Compose**, contemplando soporte para **Modo Claro** y **Modo Oscuro**:
-
-| Token M3 | Modo Claro (Light) | Modo Oscuro (Dark) | Descripción |
-| :--- | :--- | :--- | :--- |
-| `primary` | `#6B8E23` (Sage Green) | `#A8C673` (Luminous Sage) | Acciones principales y botones destacados |
-| `primaryContainer` | `#8FA853` (Sage Light) | `#2E4239` (Forest Surface Variant) | Contenedores de realce |
-| `secondary` | `#E8DFD8` (Muted Sand) | `#A3B5A8` (Soft Muted Sage) | Elementos secundarios |
-| `background` | `#FBF9F5` (Warm Off-White) | `#15201A` (Forest Night) | Fondo de la pantalla completa |
-| `surface` | `#FFFFFF` (Pure White) | `#22322A` (Forest Surface) | Fondo de tarjetas elevadas |
-| `onSurface` | `#2C3E35` (Dark Forest Green) | `#F1EFEA` (Warm Off-White Text) | Títulos y textos de alto contraste |
-| `onSurfaceVariant` | `#5C6F64` (Muted Forest) | `#A3B5A8` (Soft Muted Sage) | Subtítulos y descripciones secundarias |
-| `outlineVariant` | `#E8DFD8` (Sand) | `#3B5045` (Forest Outline) | Divisores y bordes de botones |
-
----
-
-## 📸 1.4. Capturas de Pantalla de Referencia (Placeholders / Screenshots)
+## 📸 1.3. Capturas de Pantalla de Referencia (Placeholders / Screenshots)
 
 Si estás realizando el workshop en vivo y no tienes acceso a Stitch o prefieres ahorrar tiempo, puedes utilizar directamente estas capturas de pantalla pregeneradas disponibles en la carpeta [`screenshots/`](../screenshots/):
 
@@ -118,8 +99,8 @@ Si estás realizando el workshop en vivo y no tienes acceso a Stitch o prefieres
 | `screenshots/dark_home.png` | `screenshots/dark_timer.png` | `screenshots/dark_settings.png` |
 
 > [!TIP]
-> **Para el Módulo 2:** Guarda o ten a mano los archivos `screenshots/home_screen.png`, `screenshots/timer_screen.png` y `screenshots/settings_screen.png` para adjuntarlos a Gemini en Android Studio cuando uses la opción multimodal.
+> **Para el Módulo 2:** Guarda o ten a mano los archivos `screenshots/home_screen.png`, `screenshots/timer_screen.png` y `screenshots/settings_screen.png` para adjuntarlos a Gemini en Android Studio cuando uses la opción multimodal. Los tokens de diseño ya están incluidos directamente en el prompt del Módulo 2.
 
 ---
 
-¡Listo! Con la interfaz prototipada en [Google Stitch](https://stitch.withgoogle.com/) y los tokens a mano, avanza al archivo **`02-setup-android-studio-ia.md`**.
+¡Listo! Con la interfaz prototipada en [Google Stitch](https://stitch.withgoogle.com/), avanza al archivo **`02-setup-android-studio-ia.md`**.

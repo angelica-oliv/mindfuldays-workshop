@@ -82,26 +82,7 @@ REQUIRED SCREENS & EXACT ELEMENTS:
 
 ---
 
-## 🎨 1.3. Extração de Assets e Tokens (Material Design 3)
-
-Após gerar as telas no [Google Stitch](https://stitch.withgoogle.com/):
-1. Capture screenshots em alta resolução das 3 telas geradas (você usará essas imagens no Módulo 2 no Android Studio).
-2. Anote os tokens de cores para configuração no **Jetpack Compose**, prevendo suporte para **Modo Claro** e **Modo Escuro**:
-
-| Token M3 | Modo Claro (Light) | Modo Escuro (Dark) | Descrição |
-| :--- | :--- | :--- | :--- |
-| `primary` | `#6B8E23` (Sage Green) | `#A8C673` (Luminous Sage) | Ações principais e botões de destaque |
-| `primaryContainer` | `#8FA853` (Sage Light) | `#2E4239` (Forest Surface Variant) | Contêineres de destaque |
-| `secondary` | `#E8DFD8` (Muted Sand) | `#A3B5A8` (Soft Muted Sage) | Elementos secundários |
-| `background` | `#FBF9F5` (Warm Off-White) | `#15201A` (Forest Night) | Fundo da tela inteira |
-| `surface` | `#FFFFFF` (Pure White) | `#22322A` (Forest Surface) | Fundo de cards elevados |
-| `onSurface` | `#2C3E35` (Dark Forest Green) | `#F1EFEA` (Warm Off-White Text) | Títulos e textos de alto contraste |
-| `onSurfaceVariant` | `#5C6F64` (Muted Forest) | `#A3B5A8` (Soft Muted Sage) | Subtítulos e descrições secundárias |
-| `outlineVariant` | `#E8DFD8` (Sand) | `#3B5045` (Forest Outline) | Divisores e bordas de botões |
-
----
-
-## 📸 1.4. Capturas de Tela de Referência (Placeholders / Screenshots)
+## 📸 1.3. Capturas de Tela de Referência (Placeholders / Screenshots)
 
 Se você estiver realizando o workshop ao vivo e não tiver acesso ao Stitch ou preferir ganhar tempo, pode utilizar diretamente estas capturas de tela pré-geradas disponíveis na pasta [`screenshots/`](../screenshots/):
 
@@ -118,8 +99,8 @@ Se você estiver realizando o workshop ao vivo e não tiver acesso ao Stitch ou 
 | `screenshots/dark_home.png` | `screenshots/dark_timer.png` | `screenshots/dark_settings.png` |
 
 > [!TIP]
-> **Para o Módulo 2:** Salve ou tenha em mãos os arquivos `screenshots/home_screen.png`, `screenshots/timer_screen.png` e `screenshots/settings_screen.png` para anexá-los ao Gemini no Android Studio quando for utilizar a opção multimodal.
+> **Para o Módulo 2:** Salve ou tenha em mãos os arquivos `screenshots/home_screen.png`, `screenshots/timer_screen.png` e `screenshots/settings_screen.png` para anexá-los ao Gemini no Android Studio quando for utilizar a opção multimodal. Os tokens de design já estão incluídos diretamente no prompt do Módulo 2.
 
 ---
 
-Pronto! Com a interface prototipada no [Google Stitch](https://stitch.withgoogle.com/) e os tokens em mãos, avance para o **`02-setup-android-studio-ai.md`**.
+Pronto! Com a interface prototipada no [Google Stitch](https://stitch.withgoogle.com/), avance para o **`02-setup-android-studio-ai.md`**.
