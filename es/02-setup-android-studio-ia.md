@@ -15,19 +15,7 @@ En este segundo módulo, configuraremos el proyecto de la aplicación **MindfulD
 
 ---
 
-## 📦 2.2. Definiendo el Nombre del Paquete y la Estructura
-
-Al crear el proyecto, completa los parámetros fundamentales:
-
-* **Name**: `MindfulDays`
-* **Package Name**: `dev.mindfuldays.app` (Estándar profesional y recomendado para proyectos open-source / dev).
-* **Language**: Kotlin
-* **Minimum SDK**: API 24 (Android 7.0 Nougat o superior)
-* **Build Configuration Language**: Kotlin DSL (`build.gradle.kts`)
-
----
-
-## 🤖 2.3. Prompt Multimodal para Gemini en Android Studio
+## 🤖 2.2. Prompt Multimodal para Gemini en Android Studio
 
 Abre el panel de **Gemini** en Android Studio (**View → Tool Windows → Gemini**) o utiliza la ventana **Create with AI**. Adjunta las capturas de pantalla generadas en **Stitch** (o utiliza directamente las imágenes en `screenshots/` del repositorio: `home_screen.png`, `timer_screen.png`, `settings_screen.png`) y pega el siguiente prompt estructurado y prescriptivo:
 
@@ -206,6 +194,18 @@ Since this project will be built progressively across workshop modules, generate
 
 Write clean, concise, idiomatic Kotlin and Jetpack Compose code with no unnecessary dependencies.
 ```
+
+---
+
+## 📦 2.3. Definiendo el Nombre del Paquete y la Estructura
+
+Al crear el proyecto con **Create with AI**, verifica y completa los parámetros fundamentales:
+
+* **Name**: `MindfulDays`
+* **Package Name**: `dev.mindfuldays.app` (Estándar profesional y recomendado para proyectos open-source / dev).
+* **Language**: Kotlin
+* **Minimum SDK**: API 24 (Android 7.0 Nougat o superior)
+* **Build Configuration Language**: Kotlin DSL (`build.gradle.kts`)
 
 ---
 
