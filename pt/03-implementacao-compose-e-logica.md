@@ -71,7 +71,7 @@ Respeite estritamente os tokens de cores semânticos do Material 3, garantindo s
 1. **Regra das 9 Atitudes**: A lista contém exatamente 9 atitudes fixas. O cálculo da atitude diária deve usar o dia do ano:
    `val index = (dayOfYear - 1).mod(attitudes.size)`
 2. **Gemini API (Reflexões Diárias)**:
-   - Utilizar o endpoint do modelo `gemini-2.5-flash:generateContent` (ou `gemini-3.8-flash:generateContent`).
+   - Utilizar exclusivamente o endpoint do modelo `gemini-3.8-flash:generateContent` (modelos anteriores como 2.5-flash foram descontinuados e retornam 404).
    - Configurar OkHttpClient com timeouts adequados para LLM (`connectTimeout`: 30s, `readTimeout`: 60s, `writeTimeout`: 30s). Não fixar `callTimeout` agressivos nem `pingInterval` para evitar erros de SocketTimeoutException.
    - Gerar reflexões concisas e inspiradoras com no máximo 2 frases para cada atitude, respeitando o idioma do usuário (pt, en, es).
    - Tratar ausência de chave de API e erros de rede com fallback amigável offline sem quebrar o app.
@@ -156,7 +156,7 @@ Realize em um único passo todas as configurações e implementações pendentes
 4. INTEGRAÇÃO COM GEMINI API (GeminiApiService.kt):
    - Em `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
      * Defina os DTOs com `@JsonClass(generateAdapter = true)`: `GeminiRequest`, `Content`, `Part`, `GeminiResponse`, `Candidate`, `ContentResponse`, `PartResponse`.
-     * Interface Retrofit `GeminiApi` com `@POST("v1beta/models/gemini-2.5-flash:generateContent")` (ou `gemini-3.8-flash:generateContent`) recebendo `@Query("key") apiKey: String` e `@Body request: GeminiRequest`.
+     * Interface Retrofit `GeminiApi` com `@POST("v1beta/models/gemini-3.8-flash:generateContent")` (IMPORTANTE: use EXCLUSIVAMENTE 'gemini-3.8-flash'; NÃO use 'gemini-2.5-flash' pois retorna 404) recebendo `@Query("key") apiKey: String` e `@Body request: GeminiRequest`.
      * Configure `OkHttpClient.Builder()` otimizado para LLMs com timeouts adequados:
        - `.connectTimeout(30, TimeUnit.SECONDS)`
        - `.readTimeout(60, TimeUnit.SECONDS)`
@@ -177,8 +177,36 @@ Realize em um único passo todas as configurações e implementações pendentes
      * Exponha `val uiState: StateFlow<MindfulnessUiState>` inicializado com `repository.getTodayAttitude()`.
      * Implemente `fun generateAiReflection(attitudeTitle: String? = null, languageCode: String = Locale.getDefault().language)` atualizando `isLoadingAi = true`, chamando `geminiService.generateReflection` e atualizando o estado.
 
-6. AUDITORIA DE UI E TEMA:
-   - Revise `HomeScreen.kt` e `Theme.kt`: certifique-se de que não haja cores hexadecimais hardcoded (usar `MaterialTheme.colorScheme.*`), todos os textos usem `stringResource(R.string.*)` e `HomeScreen` delegue para um composable stateless `HomeScreenContent` desacoplado para facilitar os testes.
+6. DESIGN TOKENS E SISTEMA DE TEMA (Color.kt e Theme.kt):
+   - Em `dev/mindfuldays/app/ui/theme/Color.kt`:
+     * Codifique explicitamente as cores do design:
+       val SageGreen = Color(0xFF6B8E23)
+       val SoftSage = Color(0xFF8FA853)
+       val MutedSand = Color(0xFFE8DFD8)
+       val WarmOffWhite = Color(0xFFFBF9F5)
+       val PureWhite = Color(0xFFFFFFFF)
+       val DarkForestGreen = Color(0xFF2C3E35)
+       val MutedForestGreen = Color(0xFF5C6F64)
+       val LuminousSage = Color(0xFFA8C673)
+       val DeepForestSurface = Color(0xFF2E4239)
+       val DeepTranquilForest = Color(0xFF15201A)
+       val ElevatedForestSurface = Color(0xFF22322A)
+       val WarmOffWhiteText = Color(0xFFF1EFEA)
+       val SoftMutedSage = Color(0xFFA3B5A8)
+       val ForestOutline = Color(0xFF3B5045)
+   - Em `dev/mindfuldays/app/ui/theme/Theme.kt`:
+     * Desative a cor dinâmica do sistema operacional por padrão (`dynamicColor: Boolean = false`) para evitar que o papel de parede do dispositivo sobrescreva e altere a paleta do app.
+     * Configure `LightColorScheme`:
+       primary = SageGreen, primaryContainer = SoftSage, secondary = MutedSand,
+       background = WarmOffWhite, surface = PureWhite, onPrimary = PureWhite,
+       onBackground = DarkForestGreen, onSurface = DarkForestGreen,
+       onSurfaceVariant = MutedForestGreen, outlineVariant = MutedSand
+     * Configure `DarkColorScheme`:
+       primary = LuminousSage, primaryContainer = DeepForestSurface, secondary = SoftMutedSage,
+       background = DeepTranquilForest, surface = ElevatedForestSurface, onPrimary = DeepTranquilForest,
+       onBackground = WarmOffWhiteText, onSurface = WarmOffWhiteText,
+       onSurfaceVariant = SoftMutedSage, outlineVariant = ForestOutline
+   - Audite `HomeScreen.kt`, `TimerScreen.kt`, `SettingsScreen.kt`: NUNCA use cores hexadecimais hardcoded, utilize sempre `MaterialTheme.colorScheme.*` e certifique-se de que todos os textos usem `stringResource(R.string.*)`. Além disso `HomeScreen` deve delegar para um composable stateless `HomeScreenContent` desacoplado para facilitar os testes.
 
 Sincronize o projeto e verifique se './gradlew assembleDebug' compila com sucesso.
 ```
