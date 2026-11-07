@@ -71,7 +71,7 @@ Respeta estrictamente los tokens semánticos de colores de Material 3, garantiza
 1. **Regla de las 9 Actitudes**: La lista contiene exactamente 9 actitudes fijas. La actitud del día se calcula determinísticamente a partir del día del año:
    `val index = (dayOfYear - 1).mod(attitudes.size)`
 2. **Gemini API (Reflexiones Diarias)**:
-   - Utilizar exclusivamente el endpoint del modelo `gemini-3.8-flash:generateContent` (los modelos anteriores como 2.5-flash están discontinuados y devuelven 404).
+   - Utilizar el endpoint del modelo `gemini-3.5-flash:generateContent` (o `gemini-3.5-flash-lite:generateContent`).
    - Configurar OkHttpClient con timeouts holgados adecuados para LLM (`connectTimeout`: 30s, `readTimeout`: 60s, `writeTimeout`: 30s). No fijar `callTimeout` agresivos ni `pingInterval` para evitar errores de SocketTimeoutException.
    - Generar reflexiones concisas e inspiradoras con un máximo de 2 oraciones por actitud, respetando el idioma del usuario (pt, en, es).
    - Manejar la ausencia de clave de API y errores de red con un mensaje amigable offline sin romper la app.
@@ -119,7 +119,7 @@ Para entender lo que la IA implementará en el prompt unificado:
        return attitudes[index]
    }
    ```
-4. **Cliente Gemini API**: Llamada REST a `v1beta/models/gemini-3.8-flash:generateContent` con adaptadores Moshi en Kotlin y fallback amigable offline si no hay red o falta la clave.
+4. **Cliente Gemini API**: Llamada REST a `v1beta/models/gemini-3.5-flash:generateContent` con adaptadores Moshi en Kotlin y fallback amigable offline si no hay red o falta la clave.
 
 ---
 
@@ -156,7 +156,7 @@ Realiza en un solo paso todas las configuraciones e implementaciones pendientes 
 4. INTEGRACIÓN CON GEMINI API (GeminiApiService.kt):
    - En `dev/mindfuldays/app/data/remote/GeminiApiService.kt`:
      * Define los DTOs con `@JsonClass(generateAdapter = true)`: `GeminiRequest`, `Content`, `Part`, `GeminiResponse`, `Candidate`, `ContentResponse`, `PartResponse`.
-     * Interfaz Retrofit `GeminiApi` con `@POST("v1beta/models/gemini-3.8-flash:generateContent")` (IMPORTANTE: usa EXCLUSIVAMENTE 'gemini-3.8-flash'; NO uses 'gemini-2.5-flash' ya que devuelve 404) recibiendo `@Query("key") apiKey: String` y `@Body request: GeminiRequest`.
+     * Interfaz Retrofit `GeminiApi` con `@POST("v1beta/models/gemini-3.5-flash:generateContent")` (IMPORTANTE: usa EXCLUSIVAMENTE 'gemini-3.5-flash' o 'gemini-3.5-flash-lite'; NO uses 'gemini-2.5-flash' que da 404 ni 'gemini-3.8-flash' que se congela) recibiendo `@Query("key") apiKey: String` y `@Body request: GeminiRequest`.
      * Configura `OkHttpClient.Builder()` optimizado para LLMs con timeouts holgados:
        - `.connectTimeout(30, TimeUnit.SECONDS)`
        - `.readTimeout(60, TimeUnit.SECONDS)`
