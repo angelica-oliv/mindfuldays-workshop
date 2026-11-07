@@ -313,7 +313,7 @@ Para encerrar o workshop com sucesso, faça a verificação completa do projeto 
 ## 🎁 4.7. Passo Opcional: Geração do Ícone do App com IA (Adaptive Icons & Asset Studio)
 
 No Android moderno (Android 8.0 Oreo até Android 15+), os ícones dos aplicativos utilizam a especificação de **Adaptive Icons** (Ícones Adaptáveis), compostos por duas camadas principais:
-1. **Camada de Primeiro Plano (Foreground)**: A ilustração ou símbolo central (ex: flor de lótus minimalista ou pedra zen em verde sálvia).
+1. **Camada de Primeiro Plano (Foreground)**: A ilustração ou símbolo central (ex.: silhueta estilizada da flor de lótus em verde sálvia com detalhes em branco).
 2. **Camada de Fundo (Background)**: Cor sólida ou gradiente sutil de fundo (`#FBF9F5` ou `#15201A`).
 3. **Ícone Monocromático (Monochrome / Themed Icon)**: Utilizado a partir do Android 13 para se adaptar dinamicamente ao tema do Material You do usuário.
 
@@ -323,11 +323,12 @@ Você pode utilizar o **Google ImageFX** ou o **Gemini** para gerar a arte vetor
 
 ```text
 A minimalist, modern vector app icon foreground illustration for an Android mindfulness application named "MindfulDays".
-- Motif: An elegant, serene stylized lotus flower and a zen meditation stone circle.
-- Style: Ultra-clean flat vector illustration, pure lines, no drop shadows, centered composition.
-- Colors: Sage green (#6B8E23) and pure white accents (#FFFFFF).
-- Background: Isolated on a completely transparent background (or solid white for easy cutout).
-- Constraints: No text, no letters, no gradients, designed to fit inside a circular adaptive icon mask with 25% safe margin.
+- Motif: An elegant, serene stylized lotus flower silhouette. Centered, balanced, and modern. No stones, no pebbles, no extra clutter.
+- Style: Material 3 aesthetic, bold geometric flat vector mark, solid shapes with subtle clean negative space, no fine wireframe lines, no skeuomorphism, no drop shadows, no outer circular border or frame.
+- Composition: Floating standalone logo mark strictly centered, leaving 25% safe margin padding around all edges for Android adaptive icon system cropping.
+- Colors: Solid sage green (#6B8E23) with crisp white accents (#FFFFFF).
+- Background: Isolated on a completely solid, pure white background (#FFFFFF) for seamless cutout and vectorization.
+- Constraints: No text, no letters, no gradients, no enclosing circle border, no photorealism.
 ```
 
 ### 🛠️ Configurando no Android Studio via Asset Studio
